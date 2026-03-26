@@ -231,19 +231,31 @@ h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:600;letter-spacing:-0.02em;lin
 .proj-title{font-size:1.15rem;font-weight:600;letter-spacing:-0.01em;margin-bottom:0.65rem}
 .proj-desc{font-size:0.855rem;color:var(--text-2);line-height:1.85;margin-bottom:1.25rem;flex:1}
 
-/* Project mockup screen */
-.proj-screen{
+/* Project image */
+.proj-img{
   border-radius:12px;overflow:hidden;margin-bottom:1.25rem;
   border:1px solid rgba(255,255,255,0.08);
-  background:#04040a;
+  aspect-ratio:16/9;position:relative;background:#04040a;
 }
-.ps-bar{
-  height:26px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06);
-  display:flex;align-items:center;padding:0 0.7rem;gap:5px;
+.proj-img img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 0.4s ease;
 }
-.ps-dot{width:7px;height:7px;border-radius:50%}
-.ps-body{padding:0.85rem;font-family:'SF Mono','Fira Code',monospace;font-size:0.62rem;line-height:1.75;color:rgba(255,255,255,0.35)}
-.ps-body .kw{color:#a78bfa}.ps-body .fn{color:#60a5fa}.ps-body .str{color:#86efac}.ps-body .cm{color:rgba(255,255,255,0.22);font-style:italic}.ps-body .tl{color:var(--teal)}
+.proj-card:hover .proj-img img{transform:scale(1.04)}
+.proj-img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 60%);
+  pointer-events:none;
+}
+/* Placeholder when no image */
+.proj-img-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
+  color:rgba(255,255,255,0.18);font-size:0.78rem;letter-spacing:0.06em;
+  border:1px dashed rgba(255,255,255,0.1);border-radius:12px;
+  background:rgba(255,255,255,0.02);
+}
+.proj-img-placeholder svg{opacity:0.3}
 
 .proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem}
 .pt{
@@ -504,7 +516,7 @@ footer p{font-size:0.72rem;color:var(--text-3)}
       <div class="proj-inner">
         <div>
           <div class="proj-top"><span class="proj-num">001 · FEATURED</span><span class="proj-status st-done">Completed</span></div>
-          <div class="proj-title">CubeSat FPGA Platform</div>
+          <a href="cubesat.html" class="proj-title" style="color:var(--text);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--text)'">CubeSat FPGA Platform ↗</a>
           <div class="proj-desc">Space-grade FPGA processing platform for CubeSat orbital missions. Developed with ADA-SPARK formal verification to mathematically prove correctness — because at 400 km altitude, there's no such thing as a hotfix.</div>
           <div class="proj-tags">
             <span class="pt">VHDL</span><span class="pt">ADA-SPARK</span><span class="pt">FPGA</span>
@@ -512,23 +524,13 @@ footer p{font-size:0.72rem;color:var(--text-3)}
           </div>
           <a href="#" class="proj-link">View on GitHub →</a>
         </div>
-        <div class="proj-screen">
-          <div class="ps-bar"><div class="ps-dot" style="background:#ff5f57"></div><div class="ps-dot" style="background:#ffbd2e"></div><div class="ps-dot" style="background:#28c840"></div><span style="font-family:monospace;font-size:0.52rem;color:rgba(255,255,255,0.25);margin-left:6px">cubesat_top.vhd</span></div>
-          <div class="ps-body">
-<span class="cm">-- CubeSat FPGA Top-Level Entity</span><br/>
-<span class="cm">-- ADA-SPARK verified · radiation tolerant</span><br/>
-<br/>
-<span class="kw">entity</span> <span class="fn">cubesat_top</span> <span class="kw">is</span><br/>
-&nbsp;&nbsp;<span class="kw">port</span> (<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;clk_sys &nbsp;&nbsp;: <span class="kw">in</span> std_logic;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;rst_n &nbsp;&nbsp;&nbsp;&nbsp;: <span class="kw">in</span> std_logic;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;telemetry : <span class="kw">out</span> std_logic_vector(<span class="tl">7</span> <span class="kw">downto</span> <span class="tl">0</span>)<br/>
-&nbsp;&nbsp;);<br/>
-<span class="kw">end entity</span>;<br/>
-<br/>
-<span class="cm">-- Proof status: VERIFIED ✓</span><br/>
-<span class="cm">-- Fault injection: PASS</span>
+        <div class="proj-img">
+          <!-- Replace src with your actual image filename e.g. src="cubesat.jpg" -->
+          <div class="proj-img-placeholder">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Add project image
           </div>
+          <div class="proj-img-overlay"></div>
         </div>
       </div>
     </div>
@@ -537,19 +539,10 @@ footer p{font-size:0.72rem;color:var(--text-3)}
     <div class="glass proj-card fi">
       <div class="proj-top"><span class="proj-num">002</span><span class="proj-status st-done">Completed</span></div>
       <div class="proj-title">DriveGuard</div>
-      <div class="proj-screen">
-        <div class="ps-bar"><div class="ps-dot" style="background:#ff5f57"></div><div class="ps-dot" style="background:#ffbd2e"></div><div class="ps-dot" style="background:#28c840"></div><span style="font-family:monospace;font-size:0.52rem;color:rgba(255,255,255,0.25);margin-left:6px">monitor.c</span></div>
-        <div class="ps-body">
-<span class="cm">// Real-time drowsiness detection</span><br/>
-<span class="kw">void</span> <span class="fn">driveguard_loop</span>() {<br/>
-&nbsp;&nbsp;<span class="kw">float</span> ear = <span class="fn">get_eye_ratio</span>();<br/>
-&nbsp;&nbsp;<span class="kw">if</span> (ear &lt; EAR_THRESH) {<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;alert_latency = <span class="tl">12</span>; <span class="cm">// ms</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">trigger_alert</span>(LEVEL_WARN);<br/>
-&nbsp;&nbsp;}<br/>
-}<br/>
-<span class="cm">// inference: 12ms · status: CLEAR</span>
-        </div>
+      <div class="proj-img">
+        <!-- This is how you add an image — just upload the file to GitHub and update src -->
+        <img src="predator.webp" alt="MQ-1 Predator drone — the kind of system this work supports"/>
+        <div class="proj-img-overlay"></div>
       </div>
       <div class="proj-desc">IoT driver safety system detecting drowsiness in real time. Built around one constraint: alert must fire before the brain registers danger.</div>
       <div class="proj-tags"><span class="pt">IoT</span><span class="pt">Embedded C</span><span class="pt">Edge AI</span><span class="pt">Sensors</span></div>
@@ -560,17 +553,13 @@ footer p{font-size:0.72rem;color:var(--text-3)}
     <div class="glass proj-card fi2">
       <div class="proj-top"><span class="proj-num">003</span><span class="proj-status st-live">Active</span></div>
       <div class="proj-title">Self-Hosted Infrastructure</div>
-      <div class="proj-screen">
-        <div class="ps-bar"><div class="ps-dot" style="background:#ff5f57"></div><div class="ps-dot" style="background:#ffbd2e"></div><div class="ps-dot" style="background:#28c840"></div><span style="font-family:monospace;font-size:0.52rem;color:rgba(255,255,255,0.25);margin-left:6px">dashboard</span></div>
-        <div class="ps-body">
-<span class="tl">CM4</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;● <span class="str">ONLINE</span> &nbsp;CPU <span class="tl">34%</span><br/>
-<span class="tl">CORAL TPU</span> ● <span class="str">ONLINE</span> &nbsp;infer <span class="tl">12ms</span><br/>
-<span class="tl">STORAGE</span> &nbsp;&nbsp;● <span class="str">ONLINE</span> &nbsp;<span class="tl">78GB</span> free<br/>
-<br/>
-uptime: <span class="tl">47d 12h 08m</span><br/>
-power: &nbsp;<span class="tl">4.2W</span> avg<br/>
-<span class="cm">// paying $0/month</span>
+      <div class="proj-img">
+        <!-- Replace with your actual project photo -->
+        <div class="proj-img-placeholder">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Add project image
         </div>
+        <div class="proj-img-overlay"></div>
       </div>
       <div class="proj-desc">Raspberry Pi CM4 + Coral Edge TPU running local AI inference, file serving, and automation. Built because paying monthly fees to run three containers felt like a moral failure.</div>
       <div class="proj-tags"><span class="pt">RPi CM4</span><span class="pt">Coral TPU</span><span class="pt">Linux</span><span class="pt">Self-Hosted</span></div>
