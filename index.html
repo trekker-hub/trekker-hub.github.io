@@ -8,713 +8,687 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,300&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
-  --glass-bg:rgba(255,255,255,0.07);
-  --glass-bg-hover:rgba(255,255,255,0.11);
-  --glass-border:rgba(255,255,255,0.18);
-  --glass-border-strong:rgba(255,255,255,0.32);
-  --glass-blur:24px;
-  --text:rgba(255,255,255,0.95);
-  --text-2:rgba(255,255,255,0.58);
-  --text-3:rgba(255,255,255,0.32);
-  --teal:rgba(80,220,200,1);
-  --teal-soft:rgba(80,220,200,0.15);
-  --teal-border:rgba(80,220,200,0.35);
+  --sidebar:260px;
+  --teal:rgb(80,220,200);
+  --teal-soft:rgba(80,220,200,0.12);
+  --teal-border:rgba(80,220,200,0.3);
+  --glass:rgba(255,255,255,0.06);
+  --glass-hover:rgba(255,255,255,0.1);
+  --border:rgba(255,255,255,0.09);
+  --border-strong:rgba(255,255,255,0.22);
+  --text:rgba(255,255,255,0.93);
+  --text-2:rgba(255,255,255,0.55);
+  --text-3:rgba(255,255,255,0.28);
 }
 
 html{scroll-behavior:smooth}
 body{
-  min-height:100vh;
-  background:#08080f;
-  color:var(--text);
-  font-family:'Inter',sans-serif;
-  font-weight:300;
-  font-size:15px;
-  line-height:1.7;
+  background:#080c14;color:var(--text);
+  font-family:'Inter',sans-serif;font-weight:300;font-size:15px;line-height:1.7;
   overflow-x:hidden;
 }
 
-/* ── BACKGROUND ORBS ── */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:drift 20s ease-in-out infinite alternate}
-.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(60,100,255,0.45) 0%,transparent 70%);top:-200px;left:-150px;animation-delay:0s}
-.o2{width:550px;height:550px;background:radial-gradient(circle,rgba(80,220,200,0.35) 0%,transparent 70%);top:40%;right:-100px;animation-delay:-7s}
-.o3{width:500px;height:500px;background:radial-gradient(circle,rgba(180,60,255,0.3) 0%,transparent 70%);bottom:-100px;left:25%;animation-delay:-13s}
-.o4{width:350px;height:350px;background:radial-gradient(circle,rgba(255,100,150,0.25) 0%,transparent 70%);top:25%;left:15%;animation-delay:-5s}
-.o5{width:300px;height:300px;background:radial-gradient(circle,rgba(80,200,255,0.2) 0%,transparent 70%);bottom:20%;right:20%;animation-delay:-10s}
+/* ── PERF-OPTIMISED BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;contain:strict}
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(70px); /* reduced from 90px */
+  will-change:transform;transform:translateZ(0);
+  animation:drift 22s ease-in-out infinite alternate;
+}
+.o1{width:560px;height:560px;background:radial-gradient(circle,rgba(55,90,255,0.42) 0%,transparent 70%);top:-180px;left:-100px;animation-delay:0s}
+.o2{width:420px;height:420px;background:radial-gradient(circle,rgba(80,220,200,0.3) 0%,transparent 70%);top:35%;right:-60px;animation-delay:-8s}
+.o3{width:380px;height:380px;background:radial-gradient(circle,rgba(160,50,255,0.22) 0%,transparent 70%);bottom:-80px;left:30%;animation-delay:-15s}
+/* removed o4, o5 — less GPU work */
 @keyframes drift{
-  0%{transform:translate(0,0) scale(1)}
-  33%{transform:translate(45px,-35px) scale(1.06)}
-  66%{transform:translate(-25px,25px) scale(0.96)}
-  100%{transform:translate(35px,45px) scale(1.04)}
+  0%{transform:translate3d(0,0,0) scale(1)}
+  40%{transform:translate3d(35px,-28px,0) scale(1.05)}
+  100%{transform:translate3d(-18px,32px,0) scale(0.97)}
+}
+.grain{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.022;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* grain */
-.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.025;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* ── SIDEBAR LAYOUT ── */
+.layout{
+  position:relative;z-index:10;
+  display:grid;
+  grid-template-columns:var(--sidebar) 1fr;
+  min-height:100vh;
+}
 
-/* ── NAV ── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 max(1.5rem,5vw);
-  height:60px;display:flex;align-items:center;justify-content:space-between;
-  background:rgba(8,8,15,0.6);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  transition:background 0.3s;
+/* ── SIDEBAR ── */
+.sidebar{
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;
+  padding:2.5rem 1.75rem;
+  border-right:1px solid var(--border);
+  background:rgba(8,12,20,0.6);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  scrollbar-width:none;
 }
-.nav-logo{
-  font-size:0.88rem;font-weight:600;letter-spacing:0.04em;
-  color:var(--text);
-}
-.nav-logo span{color:var(--teal)}
-.nav-links{display:flex;gap:0;list-style:none}
-.nav-links a{
-  display:block;padding:0 0.9rem;height:60px;line-height:60px;
-  font-size:0.78rem;font-weight:400;letter-spacing:0.04em;
-  color:var(--text-2);text-decoration:none;
-  transition:color 0.2s;
-}
-.nav-links a:hover{color:var(--text)}
-.nav-pill{
-  font-size:0.75rem;font-weight:500;padding:0.4rem 1rem;
-  background:var(--glass-bg);border:1px solid var(--glass-border);
-  border-radius:40px;color:var(--text);text-decoration:none;
-  backdrop-filter:blur(12px);transition:background 0.2s,border-color 0.2s;
-}
-.nav-pill:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-strong)}
+.sidebar::-webkit-scrollbar{display:none}
 
-/* hamburger */
-.hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;z-index:101}
-.hbg span{display:block;width:20px;height:1.5px;background:var(--text-2);transition:all 0.2s}
-.mob-nav{
-  display:none;position:fixed;top:60px;left:0;right:0;z-index:99;
-  background:rgba(8,8,15,0.95);backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,0.06);padding:0.5rem 0;
+.sb-logo{
+  font-size:1.1rem;font-weight:600;color:var(--text);
+  letter-spacing:-0.01em;margin-bottom:0.25rem;
 }
-.mob-nav.open{display:block}
-.mob-nav a{display:block;padding:0.75rem max(1.5rem,5vw);font-size:0.85rem;color:var(--text-2);text-decoration:none;transition:color 0.15s}
-.mob-nav a:hover{color:var(--text)}
+.sb-logo span{color:var(--teal)}
+.sb-title{font-size:0.78rem;color:var(--text-3);margin-bottom:2rem;letter-spacing:0.02em}
 
-/* ── LAYOUT ── */
-.wrap{position:relative;z-index:10;max-width:1060px;margin:0 auto;padding:0 max(1.5rem,5vw)}
-
-/* ── GLASS CARD ── */
-.glass{
-  background:var(--glass-bg);
-  border:1px solid var(--glass-border);
-  border-radius:20px;
-  backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));
-  box-shadow:0 8px 40px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.1);
+.sb-avail{
+  display:inline-flex;align-items:center;gap:0.45rem;
+  font-size:0.7rem;font-weight:500;letter-spacing:0.06em;
+  color:var(--teal);background:var(--teal-soft);border:1px solid var(--teal-border);
+  border-radius:40px;padding:0.3rem 0.8rem;margin-bottom:2rem;align-self:flex-start;
 }
-.glass-sm{border-radius:14px}
-.glass:hover{border-color:var(--glass-border-strong)}
+.sb-avail::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:var(--teal);
+  animation:pulse 2s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.35;transform:scale(0.75)}}
+
+.sb-nav{list-style:none;margin-bottom:auto}
+.sb-nav a{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.55rem 0.75rem;border-radius:8px;
+  font-size:0.82rem;color:var(--text-2);text-decoration:none;
+  transition:background 0.15s,color 0.15s;
+  margin-bottom:2px;
+}
+.sb-nav a:hover{background:var(--glass);color:var(--text)}
+.sb-nav a.active{background:var(--glass);color:var(--text)}
+.sb-nav .nav-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--text-3);transition:background 0.15s;flex-shrink:0;
+}
+.sb-nav a:hover .nav-dot,.sb-nav a.active .nav-dot{background:var(--teal)}
+
+.sb-divider{height:1px;background:var(--border);margin:1.5rem 0}
+
+.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1.5rem}
+.sb-stat{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:10px;padding:0.75rem 0.7rem;text-align:center;
+}
+.sb-stat-val{font-size:1.1rem;font-weight:600;color:var(--teal);line-height:1}
+.sb-stat-lbl{font-size:0.58rem;color:var(--text-3);margin-top:0.25rem;letter-spacing:0.05em}
+
+.sb-links{display:flex;flex-direction:column;gap:0.4rem}
+.sb-link{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.75rem;color:var(--text-3);text-decoration:none;
+  padding:0.3rem 0.5rem;border-radius:6px;
+  transition:color 0.15s,background 0.15s;
+}
+.sb-link:hover{color:var(--teal);background:var(--glass)}
+.sb-link svg{flex-shrink:0;opacity:0.6}
+
+/* ── MAIN CONTENT ── */
+.main{min-width:0}
 
 /* ── HERO ── */
 #hero{
-  position:relative;z-index:10;
-  min-height:100vh;
-  display:flex;align-items:center;justify-content:center;
-  text-align:center;padding:120px max(1.5rem,5vw) 80px;
+  min-height:100vh;display:flex;align-items:center;
+  padding:80px 4rem 60px;
+  border-bottom:1px solid var(--border);
 }
+.hero-inner{max-width:720px}
 .hero-badge{
-  display:inline-flex;align-items:center;gap:0.5rem;
-  font-size:0.75rem;font-weight:500;letter-spacing:0.06em;
-  color:var(--teal);
-  background:var(--teal-soft);border:1px solid var(--teal-border);
-  border-radius:40px;padding:0.4rem 1rem;margin-bottom:2rem;
-  backdrop-filter:blur(12px);
+  display:inline-flex;align-items:center;gap:0.45rem;
+  font-size:0.72rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:1.75rem;
 }
-.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
-
-.hero-h1{
-  font-size:clamp(2.8rem,8vw,6rem);
-  font-weight:600;line-height:1.05;
-  letter-spacing:-0.03em;margin-bottom:1.5rem;
+.hero-badge::before{content:'// ';opacity:0.5}
+h1{
+  font-size:clamp(2.8rem,5vw,5rem);font-weight:600;
+  letter-spacing:-0.03em;line-height:1.05;margin-bottom:1.5rem;
 }
-.hero-h1 em{font-style:italic;font-weight:300;color:rgba(255,255,255,0.55)}
-.hero-h1 .hi{color:var(--teal)}
-
+h1 em{font-style:italic;font-weight:300;color:var(--text-2)}
+h1 .hi{color:var(--teal)}
 .hero-sub{
-  font-size:clamp(0.95rem,2vw,1.1rem);color:var(--text-2);
-  max-width:520px;margin:0 auto 3rem;line-height:1.9;
+  font-size:1.05rem;color:var(--text-2);max-width:560px;
+  line-height:1.9;margin-bottom:2.5rem;
 }
-.hero-actions{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
-.btn-glass{
-  font-size:0.82rem;font-weight:500;padding:0.75rem 1.75rem;
-  border-radius:40px;text-decoration:none;
-  border:1px solid var(--glass-border-strong);
-  background:var(--glass-bg);color:var(--text);
-  backdrop-filter:blur(12px);
-  transition:background 0.2s,border-color 0.2s,transform 0.15s;
-  display:inline-block;
+.hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
+.btn{
+  font-size:0.8rem;font-weight:500;padding:0.65rem 1.5rem;
+  border-radius:40px;text-decoration:none;display:inline-block;
+  border:1px solid var(--border-strong);background:var(--glass);color:var(--text);
+  transition:background 0.15s,border-color 0.15s,transform 0.12s;
+  /* no backdrop-filter on buttons — too many blur layers causes lag */
 }
-.btn-glass:hover{background:var(--glass-bg-hover);border-color:rgba(255,255,255,0.45);transform:translateY(-2px)}
-.btn-glass.primary{
-  background:rgba(80,220,200,0.18);
-  border-color:var(--teal-border);
-  color:var(--teal);
-}
-.btn-glass.primary:hover{background:rgba(80,220,200,0.28)}
+.btn:hover{background:var(--glass-hover);border-color:rgba(255,255,255,0.38);transform:translateY(-2px)}
+.btn.primary{background:rgba(80,220,200,0.15);border-color:var(--teal-border);color:var(--teal)}
+.btn.primary:hover{background:rgba(80,220,200,0.25)}
 
-/* hero stats strip */
-.hero-stats{
-  display:flex;gap:1px;margin-top:4rem;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:16px;overflow:hidden;
-  max-width:600px;margin-left:auto;margin-right:auto;
+/* ── SECTIONS ── */
+.sec{padding:5rem 4rem}
+.sec+.sec{border-top:1px solid var(--border)}
+.sec-label{
+  font-size:0.65rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;
 }
-.hs-item{
-  flex:1;padding:1.1rem 1rem;text-align:center;
-  background:rgba(255,255,255,0.03);
-  backdrop-filter:blur(20px);
-}
-.hs-val{font-size:1.4rem;font-weight:600;color:var(--teal);line-height:1;margin-bottom:0.3rem}
-.hs-label{font-size:0.68rem;color:var(--text-3);letter-spacing:0.06em}
+.sec-label::before{content:'';width:18px;height:1px;background:var(--teal)}
+h2{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:600;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.5rem}
+.sec-desc{font-size:0.92rem;color:var(--text-2);max-width:500px;line-height:1.9;margin-bottom:2.5rem}
 
-/* ── SECTION ── */
-.sec{padding:6rem 0}
-.sec-tag{
-  display:inline-flex;align-items:center;gap:0.5rem;
-  font-size:0.7rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--teal);margin-bottom:0.75rem;
+/* ── GLASS CARD ── */
+.card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:16px;
+  /* backdrop-filter only on key cards, not all */
+  transition:border-color 0.2s;
 }
-.sec-tag::before{content:'';width:20px;height:1px;background:var(--teal)}
-h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin-bottom:0.5rem}
-.sec-desc{font-size:0.95rem;color:var(--text-2);max-width:520px;line-height:1.9;margin-bottom:3rem}
+.card:hover{border-color:var(--border-strong)}
+.card-blur{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 
 /* ── ABOUT ── */
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
-.about-main{padding:2.5rem}
-.about-main p{font-size:0.95rem;color:var(--text-2);line-height:1.95;margin-bottom:1rem}
-.about-main p:last-child{margin:0}
-.about-side{display:flex;flex-direction:column;gap:1rem}
-.info-card{padding:1.5rem}
-.ic-label{font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.5rem}
-.ic-val{font-size:0.9rem;color:var(--text);font-weight:400}
+.about-grid{display:grid;grid-template-columns:3fr 2fr;gap:1.25rem}
+.about-text{padding:2rem}
+.about-text p{font-size:0.92rem;color:var(--text-2);line-height:1.95;margin-bottom:0.9rem}
+.about-text p:last-child{margin:0}
+.about-side{display:flex;flex-direction:column;gap:0.75rem}
+.info-card{padding:1.25rem 1.4rem}
+.ic-label{font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.4rem}
+.ic-val{font-size:0.875rem;color:var(--text)}
 .ic-val strong{color:var(--teal);font-weight:500}
 
 /* ── SKILLS ── */
-.skills-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.75rem}
+.skills-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem}
 .sk{
-  padding:1.25rem 0.75rem;text-align:center;
-  border-radius:16px;cursor:default;
-  background:var(--glass-bg);border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(12px);
-  transition:background 0.2s,border-color 0.2s,transform 0.2s;
+  padding:1.25rem 0.9rem;text-align:center;border-radius:14px;cursor:default;
+  background:var(--glass);border:1px solid var(--border);
+  transition:background 0.15s,border-color 0.15s,transform 0.15s;
 }
-.sk:hover{background:var(--glass-bg-hover);border-color:var(--glass-border);transform:translateY(-3px)}
+.sk:hover{background:var(--glass-hover);border-color:var(--border-strong);transform:translateY(-3px)}
 .sk-abbr{
-  font-size:0.6rem;font-weight:600;letter-spacing:0.08em;
-  color:var(--teal);margin-bottom:0.5rem;
+  font-size:0.58rem;font-weight:600;letter-spacing:0.08em;color:var(--teal);
   background:var(--teal-soft);border:1px solid var(--teal-border);
-  border-radius:8px;padding:0.2rem 0.5rem;display:inline-block;
+  border-radius:6px;padding:0.18rem 0.5rem;display:inline-block;margin-bottom:0.5rem;
 }
-.sk-name{font-size:0.78rem;font-weight:500;color:var(--text);margin-bottom:0.15rem}
-.sk-cat{font-size:0.65rem;color:var(--text-3)}
+.sk-name{font-size:0.78rem;font-weight:500;color:var(--text);margin-bottom:0.1rem}
+.sk-cat{font-size:0.62rem;color:var(--text-3)}
 
 /* ── PROJECTS ── */
-.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-.proj-card{padding:2rem;display:flex;flex-direction:column;gap:0;transition:transform 0.2s,border-color 0.2s}
-.proj-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.28)}
-.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
-.proj-num{font-size:0.65rem;font-weight:500;letter-spacing:0.1em;color:var(--teal)}
-.proj-status{
-  font-size:0.65rem;font-weight:500;letter-spacing:0.06em;
-  padding:0.25rem 0.65rem;border-radius:40px;
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.proj-card{padding:1.75rem;display:flex;flex-direction:column;border-radius:16px;transition:transform 0.18s,border-color 0.18s}
+.proj-card:hover{transform:translateY(-4px);border-color:var(--border-strong)}
+.proj-card.featured{grid-column:1/-1}
+.proj-card.featured .proj-inner{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.proj-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem}
+.proj-num{font-size:0.62rem;font-weight:500;letter-spacing:0.1em;color:var(--teal)}
+.proj-status{font-size:0.62rem;font-weight:500;padding:0.22rem 0.6rem;border-radius:40px}
+.st-done{background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2)}
+.st-live{background:var(--teal-soft);color:var(--teal);border:1px solid var(--teal-border)}
+.proj-title-link{
+  font-size:1.1rem;font-weight:600;letter-spacing:-0.01em;
+  color:var(--text);text-decoration:none;display:block;margin-bottom:0.6rem;
+  transition:color 0.15s;
 }
-.st-done{background:rgba(80,200,120,0.15);color:#50c878;border:1px solid rgba(80,200,120,0.3)}
-.st-live{background:rgba(80,220,200,0.12);color:var(--teal);border:1px solid var(--teal-border)}
-.proj-title{font-size:1.15rem;font-weight:600;letter-spacing:-0.01em;margin-bottom:0.65rem}
-.proj-desc{font-size:0.855rem;color:var(--text-2);line-height:1.85;margin-bottom:1.25rem;flex:1}
-
-/* Project image */
+.proj-title-link:hover{color:var(--teal)}
+.proj-desc{font-size:0.855rem;color:var(--text-2);line-height:1.85;margin-bottom:1.1rem;flex:1}
 .proj-img{
-  border-radius:12px;overflow:hidden;margin-bottom:1.25rem;
-  border:1px solid rgba(255,255,255,0.08);
-  aspect-ratio:16/9;position:relative;background:#04040a;
+  border-radius:10px;overflow:hidden;margin-bottom:1.1rem;
+  border:1px solid rgba(255,255,255,0.07);aspect-ratio:16/9;
+  position:relative;background:#04040a;
 }
-.proj-img img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform 0.4s ease;
-}
+.proj-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease}
 .proj-card:hover .proj-img img{transform:scale(1.04)}
-.proj-img-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 60%);
-  pointer-events:none;
+.proj-img-ph{
+  width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.4rem;color:var(--text-3);font-size:0.72rem;letter-spacing:0.04em;
 }
-/* Placeholder when no image */
-.proj-img-placeholder{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
-  color:rgba(255,255,255,0.18);font-size:0.78rem;letter-spacing:0.06em;
-  border:1px dashed rgba(255,255,255,0.1);border-radius:12px;
-  background:rgba(255,255,255,0.02);
-}
-.proj-img-placeholder svg{opacity:0.3}
-
-.proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem}
-.pt{
-  font-size:0.65rem;font-weight:500;letter-spacing:0.04em;
-  color:rgba(255,255,255,0.55);
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:8px;padding:0.2rem 0.55rem;
-}
-.proj-link{
-  font-size:0.75rem;font-weight:500;color:var(--teal);text-decoration:none;
-  display:inline-flex;align-items:center;gap:0.3rem;align-self:flex-start;
-  transition:gap 0.15s;
-}
+.proj-tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1rem}
+.pt{font-size:0.64rem;font-weight:500;color:rgba(255,255,255,0.48);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:6px;padding:0.18rem 0.5rem}
+.proj-link{font-size:0.75rem;font-weight:500;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;align-self:flex-start;transition:gap 0.15s}
 .proj-link:hover{gap:0.5rem}
 
-/* featured project */
-.proj-card.featured{grid-column:1/-1}
-.proj-card.featured .proj-inner{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center}
-
 /* ── EXPERIENCE ── */
-.exp-list{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:20px;overflow:hidden}
+.exp-list{display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--border)}
 .exp-item{
-  padding:2rem 2.25rem;
-  background:rgba(255,255,255,0.03);
-  backdrop-filter:blur(20px);
-  transition:background 0.2s;
-  display:grid;grid-template-columns:120px 1fr;gap:2rem;
+  padding:1.75rem 2rem;background:#080c14;
+  display:grid;grid-template-columns:130px 1fr;gap:2rem;align-items:start;
+  transition:background 0.15s;
 }
-.exp-item:hover{background:rgba(255,255,255,0.06)}
-.exp-date{font-size:0.75rem;color:var(--text-3);padding-top:0.15rem;line-height:1.6}
-.exp-type{font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:0.35rem}
-.exp-role{font-size:0.975rem;font-weight:600;margin-bottom:0.2rem}
-.exp-org{font-size:0.83rem;color:var(--text-2);margin-bottom:0.65rem}
+.exp-item:hover{background:rgba(255,255,255,0.02)}
+.exp-date{font-size:0.72rem;color:var(--text-3);padding-top:0.1rem;line-height:1.6}
+.exp-type{font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:0.3rem}
+.exp-role{font-size:0.95rem;font-weight:600;margin-bottom:0.2rem}
+.exp-org{font-size:0.82rem;color:var(--text-2);margin-bottom:0.6rem}
 .exp-body{font-size:0.845rem;color:var(--text-2);line-height:1.85}
 
 /* ── AWARDS ── */
-.awards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
-.aw-card{padding:1.75rem;display:flex;gap:1rem;align-items:flex-start;transition:border-color 0.2s,transform 0.2s}
-.aw-card:hover{border-color:var(--glass-border-strong);transform:translateY(-3px)}
-.aw-icon{
-  width:42px;height:42px;flex-shrink:0;border-radius:12px;
-  background:var(--teal-soft);border:1px solid var(--teal-border);
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
-}
-.aw-title{font-size:0.95rem;font-weight:600;margin-bottom:0.2rem}
-.aw-org{font-size:0.72rem;color:var(--teal);font-weight:500;margin-bottom:0.4rem;letter-spacing:0.04em}
-.aw-desc{font-size:0.82rem;color:var(--text-2);line-height:1.75}
+.awards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.aw-card{padding:1.5rem;display:flex;gap:0.9rem;align-items:flex-start;border-radius:16px;transition:border-color 0.18s,transform 0.18s}
+.aw-card:hover{border-color:var(--border-strong);transform:translateY(-3px)}
+.aw-icon{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:var(--teal-soft);border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.aw-title{font-size:0.92rem;font-weight:600;margin-bottom:0.2rem}
+.aw-org{font-size:0.7rem;color:var(--teal);font-weight:500;margin-bottom:0.35rem;letter-spacing:0.04em}
+.aw-desc{font-size:0.8rem;color:var(--text-2);line-height:1.75}
 
 /* ── FUTURE PLANS ── */
-.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
-.plan-card{padding:1.75rem;transition:border-color 0.2s,transform 0.2s}
-.plan-card:hover{border-color:var(--glass-border-strong);transform:translateY(-3px)}
-.plan-horizon{
-  font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
-  padding:0.25rem 0.7rem;border-radius:40px;margin-bottom:1rem;display:inline-block;
-}
-.h-now{background:rgba(80,220,200,0.12);color:var(--teal);border:1px solid var(--teal-border)}
-.h-next{background:rgba(120,80,255,0.12);color:#a78bfa;border:1px solid rgba(120,80,255,0.3)}
-.h-future{background:rgba(255,180,50,0.1);color:#fbbf24;border:1px solid rgba(255,180,50,0.25)}
-.plan-title{font-size:1rem;font-weight:600;margin-bottom:0.5rem}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.plan-card{padding:1.6rem;border-radius:16px;transition:border-color 0.18s,transform 0.18s}
+.plan-card:hover{border-color:var(--border-strong);transform:translateY(-3px)}
+.plan-horizon{font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:40px;margin-bottom:0.9rem;display:inline-block}
+.h-now{background:rgba(80,220,200,0.1);color:var(--teal);border:1px solid var(--teal-border)}
+.h-next{background:rgba(120,80,255,0.1);color:#a78bfa;border:1px solid rgba(120,80,255,0.25)}
+.h-future{background:rgba(255,180,50,0.08);color:#fbbf24;border:1px solid rgba(255,180,50,0.2)}
+.plan-title{font-size:0.98rem;font-weight:600;margin-bottom:0.45rem}
 .plan-desc{font-size:0.845rem;color:var(--text-2);line-height:1.8}
 
 /* ── CONTACT ── */
-.contact-box{
-  padding:4rem;text-align:center;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.12);border-radius:24px;
-  backdrop-filter:blur(30px);
+.contact-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;
 }
-.contact-box h2{margin-bottom:0.75rem}
-.contact-box p{font-size:0.95rem;color:var(--text-2);max-width:460px;margin:0 auto 2.5rem;line-height:1.9}
-.contact-grid{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;margin-bottom:2.5rem}
-.contact-item{
-  display:flex;align-items:center;gap:0.6rem;
-  font-size:0.8rem;color:var(--text-2);
-  background:var(--glass-bg);border:1px solid var(--glass-border);
-  border-radius:40px;padding:0.55rem 1.25rem;
-  backdrop-filter:blur(12px);text-decoration:none;
-  transition:background 0.2s,border-color 0.2s,color 0.2s;
+.contact-left h2{margin-bottom:0.75rem}
+.contact-left p{font-size:0.92rem;color:var(--text-2);line-height:1.9;margin-bottom:1.75rem}
+.contact-items{display:flex;flex-direction:column;gap:0}
+.ci{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.9rem 0;border-bottom:1px solid var(--border);
 }
-.contact-item:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-strong);color:var(--text)}
-.contact-item .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.ci:first-child{border-top:1px solid var(--border)}
+.ci-label{font-size:0.72rem;color:var(--text-3);letter-spacing:0.06em}
+.ci-val{font-size:0.78rem;color:var(--text-2);text-decoration:none;transition:color 0.15s}
+.ci-val:hover{color:var(--teal)}
 
 /* ── FOOTER ── */
-footer{
-  position:relative;z-index:10;
-  border-top:1px solid rgba(255,255,255,0.06);
-  padding:1.5rem max(1.5rem,5vw);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;
-}
-footer p{font-size:0.72rem;color:var(--text-3)}
+.sb-footer{margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border)}
+.sb-footer p{font-size:0.65rem;color:var(--text-3);line-height:1.7}
+
+/* ── MOBILE NAV (hidden on desktop) ── */
+.mob-topnav{display:none}
 
 /* ── FADE IN ── */
-.fi{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
+.fi{opacity:0;transform:translateY(14px);transition:opacity 0.5s ease,transform 0.5s ease}
 .fi.in{opacity:1;transform:none}
-.fi2{opacity:0;transform:translateY(18px);transition:opacity 0.6s 0.1s ease,transform 0.6s 0.1s ease}
+.fi2{opacity:0;transform:translateY(14px);transition:opacity 0.5s 0.1s ease,transform 0.5s 0.1s ease}
 .fi2.in{opacity:1;transform:none}
-.fi3{opacity:0;transform:translateY(18px);transition:opacity 0.6s 0.2s ease,transform 0.6s 0.2s ease}
-.fi3.in{opacity:1;transform:none}
 
 /* ── RESPONSIVE ── */
-@media(max-width:840px){
-  .nav-links,.nav-pill{display:none}
-  .hbg{display:flex}
-  .about-grid{grid-template-columns:1fr}
-  .proj-grid{grid-template-columns:1fr}
-  .proj-card.featured .proj-inner{grid-template-columns:1fr}
-  .exp-item{grid-template-columns:1fr;gap:0.4rem}
-  .contact-box{padding:2.5rem 1.5rem}
-  footer{flex-direction:column;align-items:flex-start}
+@media(max-width:1024px){
+  :root{--sidebar:220px}
+  .sec{padding:4rem 2.5rem}
+  #hero{padding:80px 2.5rem 60px}
 }
-@media(max-width:520px){
-  .hero-h1{font-size:2.5rem}
-  .hero-stats{flex-wrap:wrap}
-  .hs-item{min-width:50%}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mob-topnav{
+    display:flex;position:fixed;top:0;left:0;right:0;z-index:200;
+    height:56px;align-items:center;justify-content:space-between;
+    padding:0 1.5rem;
+    background:rgba(8,12,20,0.92);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+  }
+  .mob-logo{font-size:0.9rem;font-weight:600;color:var(--text)}
+  .mob-logo span{color:var(--teal)}
+  .hbg{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+  .hbg span{display:block;width:20px;height:1.5px;background:var(--text-2);transition:all 0.2s}
+  .mob-menu{
+    display:none;position:fixed;top:56px;left:0;right:0;z-index:199;
+    background:rgba(8,12,20,0.97);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);padding:0.5rem 0;
+  }
+  .mob-menu.open{display:block}
+  .mob-menu a{display:block;padding:0.7rem 1.5rem;font-size:0.88rem;color:var(--text-2);text-decoration:none;transition:color 0.15s}
+  .mob-menu a:hover{color:var(--teal)}
+  #hero{padding:76px 1.5rem 50px;min-height:auto}
+  .sec{padding:3.5rem 1.5rem}
+  .about-grid,.proj-grid,.awards-grid,.plans-grid,.contact-wrap{grid-template-columns:1fr}
+  .proj-card.featured .proj-inner{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr;gap:0.35rem}
+}
+
+@media(max-width:480px){
+  h1{font-size:2.4rem}
   .skills-wrap{grid-template-columns:repeat(3,1fr)}
-  .awards-grid,.plans-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
+<!-- background -->
 <div class="bg">
   <div class="orb o1"></div>
   <div class="orb o2"></div>
   <div class="orb o3"></div>
-  <div class="orb o4"></div>
-  <div class="orb o5"></div>
 </div>
 <div class="grain"></div>
 
-<!-- ── NAV ── -->
-<nav>
-  <div class="nav-logo">tarek<span>.</span>dev</div>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#plans">Plans</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <a href="/resume.pdf" class="nav-pill">Resume ↓</a>
-  <button class="hbg" onclick="document.getElementById('mn').classList.toggle('open')" aria-label="menu">
+<!-- mobile top nav -->
+<div class="mob-topnav">
+  <div class="mob-logo">tarek<span>.</span>dev</div>
+  <button class="hbg" onclick="document.getElementById('mm').classList.toggle('open')" aria-label="menu">
     <span></span><span></span><span></span>
   </button>
-</nav>
-<div class="mob-nav" id="mn">
-  <a href="#about"      onclick="this.closest('#mn').classList.remove('open')">About</a>
-  <a href="#skills"     onclick="this.closest('#mn').classList.remove('open')">Skills</a>
-  <a href="#projects"   onclick="this.closest('#mn').classList.remove('open')">Projects</a>
-  <a href="#experience" onclick="this.closest('#mn').classList.remove('open')">Experience</a>
-  <a href="#plans"      onclick="this.closest('#mn').classList.remove('open')">Plans</a>
-  <a href="#contact"    onclick="this.closest('#mn').classList.remove('open')">Contact</a>
+</div>
+<div class="mob-menu" id="mm">
+  <a href="#hero"       onclick="this.closest('#mm').classList.remove('open')">Home</a>
+  <a href="#about"      onclick="this.closest('#mm').classList.remove('open')">About</a>
+  <a href="#skills"     onclick="this.closest('#mm').classList.remove('open')">Skills</a>
+  <a href="#projects"   onclick="this.closest('#mm').classList.remove('open')">Projects</a>
+  <a href="#experience" onclick="this.closest('#mm').classList.remove('open')">Experience</a>
+  <a href="#plans"      onclick="this.closest('#mm').classList.remove('open')">Plans</a>
+  <a href="#contact"    onclick="this.closest('#mm').classList.remove('open')">Contact</a>
 </div>
 
-<!-- ── HERO ── */
-<section id="hero">
-  <div>
-    <div class="hero-badge fi">Available · Spring 2026 · Northern Virginia</div>
-    <h1 class="hero-h1 fi2">
-      Hello, I'm<br/>
-      <span class="hi">Tarek.</span><br/>
-      <em>Computer Engineer.</em>
-    </h1>
-    <p class="hero-sub fi3">
-      I design hardware that works the first time —
-      FPGA systems, embedded firmware, and formally verified
-      software for defense and aerospace applications.
-    </p>
-    <div class="hero-actions fi3">
-      <a href="#projects" class="btn-glass primary">See My Work</a>
-      <a href="#contact" class="btn-glass">Get In Touch</a>
-      <a href="/resume.pdf" class="btn-glass">Resume ↓</a>
-    </div>
-    <div class="hero-stats fi3">
-      <div class="hs-item"><div class="hs-val">3.95</div><div class="hs-label">GPA</div></div>
-      <div class="hs-item"><div class="hs-val">3+</div><div class="hs-label">Projects</div></div>
-      <div class="hs-item"><div class="hs-val">2</div><div class="hs-label">A.S. Degrees</div></div>
-      <div class="hs-item"><div class="hs-val">1</div><div class="hs-label">Fermilab</div></div>
-    </div>
-  </div>
-</section>
+<div class="layout">
 
-<!-- ── ABOUT ── -->
-<section id="about" class="sec">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">About</div>
-    <h2>Who I am</h2>
-    <p class="sec-desc">Computer Engineer, hardware builder, and occasional mentor to teenagers who are better at debugging than I expected.</p>
-  </div>
-  <div class="about-grid fi2">
-    <div class="glass about-main">
-      <p>I'm a Computer Engineering student at George Mason University graduating Spring 2026 with a 3.95 GPA. My work sits where hardware meets intelligent systems — cycle-accurate HDL design, FPGA-based DSP pipelines, and formal verification for safety-critical environments.</p>
-      <p>At Fermi National Accelerator Laboratory, I worked on NPU development and quantum computing instrumentation. The kind of environment where "close enough" isn't a valid tolerance. I liked that.</p>
-      <p>I transferred to GMU after earning two Associate of Science degrees at NOVA. Outside of engineering, I run a weekly mentorship program for teenagers at a community center — because the best way to really understand something is to explain it to a 16-year-old who will immediately ask why.</p>
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-logo">tarek<span>.</span>dev</div>
+    <div class="sb-title">Computer Engineer</div>
+
+    <div class="sb-avail">Available · Spring 2026</div>
+
+    <ul class="sb-nav">
+      <li><a href="#hero" class="active"><span class="nav-dot"></span>Home</a></li>
+      <li><a href="#about"><span class="nav-dot"></span>About</a></li>
+      <li><a href="#skills"><span class="nav-dot"></span>Skills</a></li>
+      <li><a href="#projects"><span class="nav-dot"></span>Projects</a></li>
+      <li><a href="#experience"><span class="nav-dot"></span>Experience</a></li>
+      <li><a href="#awards"><span class="nav-dot"></span>Awards</a></li>
+      <li><a href="#plans"><span class="nav-dot"></span>Future Plans</a></li>
+      <li><a href="#contact"><span class="nav-dot"></span>Contact</a></li>
+    </ul>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-stats">
+      <div class="sb-stat"><div class="sb-stat-val">3.95</div><div class="sb-stat-lbl">GPA</div></div>
+      <div class="sb-stat"><div class="sb-stat-val">3+</div><div class="sb-stat-lbl">Projects</div></div>
+      <div class="sb-stat"><div class="sb-stat-val">1</div><div class="sb-stat-lbl">Fermilab</div></div>
+      <div class="sb-stat"><div class="sb-stat-val">2</div><div class="sb-stat-lbl">Degrees</div></div>
     </div>
-    <div class="about-side">
-      <div class="glass glass-sm info-card">
-        <div class="ic-label">University</div>
-        <div class="ic-val"><strong>George Mason University</strong><br/>B.S. Computer Engineering · 2026</div>
-      </div>
-      <div class="glass glass-sm info-card">
-        <div class="ic-label">Status</div>
-        <div class="ic-val"><strong>Open to work</strong><br/>Defense · Aerospace · Embedded</div>
-      </div>
-      <div class="glass glass-sm info-card">
-        <div class="ic-label">Location</div>
-        <div class="ic-val">Northern Virginia, USA</div>
-      </div>
-      <div class="glass glass-sm info-card">
-        <div class="ic-label">Interests</div>
-        <div class="ic-val">FPGA design · Formal methods · Edge AI · Nature trips · Arabic poetry</div>
-      </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-links">
+      <a href="mailto:your@email.com" class="sb-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        your@email.com
+      </a>
+      <a href="https://github.com/trekker-hub" class="sb-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        github.com/trekker-hub
+      </a>
+      <a href="https://linkedin.com/in/yourprofile" class="sb-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a href="/resume.pdf" class="sb-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Resume PDF
+      </a>
     </div>
-  </div>
-</div>
-</section>
 
-<!-- ── SKILLS ── -->
-<section id="skills" class="sec" style="padding-top:0">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">Skills</div>
-    <h2>What I work with</h2>
-    <p class="sec-desc">Hardware-first. From HDL synthesis to edge inference.</p>
-  </div>
-  <div class="skills-wrap fi2">
-    <div class="sk"><div class="sk-abbr">VHDL</div><div class="sk-name">VHDL</div><div class="sk-cat">Digital Design</div></div>
-    <div class="sk"><div class="sk-abbr">SV</div><div class="sk-name">SystemVerilog</div><div class="sk-cat">Digital Design</div></div>
-    <div class="sk"><div class="sk-abbr">FPGA</div><div class="sk-name">Xilinx / Intel</div><div class="sk-cat">FPGA</div></div>
-    <div class="sk"><div class="sk-abbr">DSP</div><div class="sk-name">DSP Pipelines</div><div class="sk-cat">Signal Proc.</div></div>
-    <div class="sk"><div class="sk-abbr">MSP</div><div class="sk-name">MSP430</div><div class="sk-cat">Embedded</div></div>
-    <div class="sk"><div class="sk-abbr">ARM</div><div class="sk-name">ARM Cortex-M</div><div class="sk-cat">Embedded</div></div>
-    <div class="sk"><div class="sk-abbr">ESP</div><div class="sk-name">ESP32</div><div class="sk-cat">Embedded</div></div>
-    <div class="sk"><div class="sk-abbr">RPi</div><div class="sk-name">Raspberry Pi</div><div class="sk-cat">Embedded</div></div>
-    <div class="sk"><div class="sk-abbr">ADA</div><div class="sk-name">ADA-SPARK</div><div class="sk-cat">Formal Methods</div></div>
-    <div class="sk"><div class="sk-abbr">TPU</div><div class="sk-name">Coral Edge TPU</div><div class="sk-cat">Edge AI</div></div>
-    <div class="sk"><div class="sk-abbr">C</div><div class="sk-name">C / Assembly</div><div class="sk-cat">Languages</div></div>
-    <div class="sk"><div class="sk-abbr">PY</div><div class="sk-name">Python</div><div class="sk-cat">Languages</div></div>
-  </div>
-</div>
-</section>
+    <div class="sb-footer">
+      <p>© 2026 Tarek<br/>Northern Virginia, USA</p>
+    </div>
+  </aside>
 
-<!-- ── PROJECTS ── -->
-<section id="projects" class="sec" style="padding-top:0">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">Projects</div>
-    <h2>Things I've built</h2>
-    <p class="sec-desc">Hardware projects, embedded systems, and infrastructure that actually runs.</p>
-  </div>
-  <div class="proj-grid">
+  <!-- ── MAIN ── -->
+  <main class="main">
 
-    <!-- CubeSat - featured -->
-    <div class="glass proj-card featured fi">
-      <div class="proj-inner">
-        <div>
-          <div class="proj-top"><span class="proj-num">001 · FEATURED</span><span class="proj-status st-done">Completed</span></div>
-          <a href="cubesat.html" class="proj-title" style="color:var(--text);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='var(--text)'">CubeSat FPGA Platform ↗</a>
-          <div class="proj-desc">Space-grade FPGA processing platform for CubeSat orbital missions. Developed with ADA-SPARK formal verification to mathematically prove correctness — because at 400 km altitude, there's no such thing as a hotfix.</div>
-          <div class="proj-tags">
-            <span class="pt">VHDL</span><span class="pt">ADA-SPARK</span><span class="pt">FPGA</span>
-            <span class="pt">Formal Verification</span><span class="pt">Space Systems</span>
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero-inner">
+        <div class="hero-badge fi">Computer Engineer</div>
+        <h1 class="fi2">
+          Hello,<br/>I'm <span class="hi">Tarek.</span><br/>
+          <em>I build hardware<br/>that works.</em>
+        </h1>
+        <p class="hero-sub fi2">
+          FPGA design, embedded firmware, and formally verified systems for defense and aerospace.
+          If it runs on silicon, I take it seriously.
+        </p>
+        <div class="hero-btns fi2">
+          <a href="#projects" class="btn primary">See My Work</a>
+          <a href="#contact" class="btn">Get In Touch</a>
+          <a href="/resume.pdf" class="btn">Resume ↓</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="sec">
+      <div class="sec-label fi">About</div>
+      <h2 class="fi">Who I am</h2>
+      <p class="sec-desc fi">Computer Engineer, hardware builder, and occasional mentor to teenagers who are better at debugging than I expected.</p>
+      <div class="about-grid fi2">
+        <div class="card card-blur about-text">
+          <p>I'm a Computer Engineering student at George Mason University graduating Spring 2026 with a 3.95 GPA. My work sits where hardware meets intelligent systems — cycle-accurate HDL design, FPGA-based DSP pipelines, and formal verification for safety-critical environments.</p>
+          <p>At Fermi National Accelerator Laboratory, I worked on NPU development and quantum computing instrumentation. The kind of environment where "close enough" isn't a valid tolerance. I liked that.</p>
+          <p>I transferred to GMU after earning two Associate of Science degrees at NOVA. Outside of engineering, I run a weekly mentorship program for teenagers at a community center — the best way to really understand something is to explain it to a 16-year-old who will immediately ask why.</p>
+        </div>
+        <div class="about-side">
+          <div class="card info-card"><div class="ic-label">University</div><div class="ic-val"><strong>George Mason University</strong><br/>B.S. Computer Engineering · 2026</div></div>
+          <div class="card info-card"><div class="ic-label">Status</div><div class="ic-val"><strong>Open to work</strong><br/>Defense · Aerospace · Embedded</div></div>
+          <div class="card info-card"><div class="ic-label">Location</div><div class="ic-val">Northern Virginia, USA</div></div>
+          <div class="card info-card"><div class="ic-label">Interests</div><div class="ic-val">FPGA · Formal methods · Edge AI<br/>Nature trips · Arabic poetry</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="sec">
+      <div class="sec-label fi">Skills</div>
+      <h2 class="fi">What I work with</h2>
+      <p class="sec-desc fi">Hardware-first. From HDL synthesis to edge inference.</p>
+      <div class="skills-wrap fi2">
+        <div class="sk"><div class="sk-abbr">VHDL</div><div class="sk-name">VHDL</div><div class="sk-cat">Digital Design</div></div>
+        <div class="sk"><div class="sk-abbr">SV</div><div class="sk-name">SystemVerilog</div><div class="sk-cat">Digital Design</div></div>
+        <div class="sk"><div class="sk-abbr">FPGA</div><div class="sk-name">Xilinx / Intel</div><div class="sk-cat">FPGA</div></div>
+        <div class="sk"><div class="sk-abbr">DSP</div><div class="sk-name">DSP Pipelines</div><div class="sk-cat">Signal Proc.</div></div>
+        <div class="sk"><div class="sk-abbr">MSP</div><div class="sk-name">MSP430</div><div class="sk-cat">Embedded</div></div>
+        <div class="sk"><div class="sk-abbr">ARM</div><div class="sk-name">ARM Cortex-M</div><div class="sk-cat">Embedded</div></div>
+        <div class="sk"><div class="sk-abbr">ESP</div><div class="sk-name">ESP32</div><div class="sk-cat">Embedded</div></div>
+        <div class="sk"><div class="sk-abbr">RPi</div><div class="sk-name">Raspberry Pi</div><div class="sk-cat">Embedded</div></div>
+        <div class="sk"><div class="sk-abbr">ADA</div><div class="sk-name">ADA-SPARK</div><div class="sk-cat">Formal Methods</div></div>
+        <div class="sk"><div class="sk-abbr">TPU</div><div class="sk-name">Coral Edge TPU</div><div class="sk-cat">Edge AI</div></div>
+        <div class="sk"><div class="sk-abbr">C</div><div class="sk-name">C / Assembly</div><div class="sk-cat">Languages</div></div>
+        <div class="sk"><div class="sk-abbr">PY</div><div class="sk-name">Python</div><div class="sk-cat">Languages</div></div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="sec">
+      <div class="sec-label fi">Projects</div>
+      <h2 class="fi">Things I've built</h2>
+      <p class="sec-desc fi">Real hardware, real constraints.</p>
+      <div class="proj-grid">
+
+        <div class="card proj-card featured fi">
+          <div class="proj-inner">
+            <div>
+              <div class="proj-top"><span class="proj-num">001 · FEATURED</span><span class="proj-status st-done">Completed</span></div>
+              <a href="cubesat.html" class="proj-title-link">CubeSat FPGA Platform ↗</a>
+              <div class="proj-desc">Space-grade FPGA processing platform for CubeSat orbital missions. Built with ADA-SPARK formal verification to mathematically prove correctness — because at 400 km altitude, there's no such thing as a hotfix.</div>
+              <div class="proj-tags">
+                <span class="pt">VHDL</span><span class="pt">ADA-SPARK</span><span class="pt">FPGA</span>
+                <span class="pt">Formal Verification</span><span class="pt">Space Systems</span>
+              </div>
+              <a href="cubesat.html" class="proj-link">Full Project Details →</a>
+            </div>
+            <div class="proj-img">
+              <div class="proj-img-ph">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Add project image
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div class="card proj-card fi">
+          <div class="proj-top"><span class="proj-num">002</span><span class="proj-status st-done">Completed</span></div>
+          <a href="#" class="proj-title-link">DriveGuard</a>
+          <div class="proj-img">
+            <img src="predator.webp" alt="Defense system — the kind of environment DriveGuard safety logic supports"/>
+          </div>
+          <div class="proj-desc">IoT driver safety system detecting drowsiness in real time with edge AI. Built around one hard constraint: the alert must fire before the brain registers danger.</div>
+          <div class="proj-tags"><span class="pt">IoT</span><span class="pt">Embedded C</span><span class="pt">Edge AI</span><span class="pt">Sensors</span></div>
           <a href="#" class="proj-link">View on GitHub →</a>
         </div>
-        <div class="proj-img">
-          <!-- Replace src with your actual image filename e.g. src="cubesat.jpg" -->
-          <div class="proj-img-placeholder">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Add project image
+
+        <div class="card proj-card fi2">
+          <div class="proj-top"><span class="proj-num">003</span><span class="proj-status st-live">Active</span></div>
+          <a href="#" class="proj-title-link">Self-Hosted Infrastructure</a>
+          <div class="proj-img">
+            <div class="proj-img-ph">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Add project image
+            </div>
           </div>
-          <div class="proj-img-overlay"></div>
+          <div class="proj-desc">Raspberry Pi CM4 + Coral Edge TPU running local AI inference, file serving, and automation. Built because paying monthly fees to run three containers felt like a moral failure.</div>
+          <div class="proj-tags"><span class="pt">RPi CM4</span><span class="pt">Coral TPU</span><span class="pt">Linux</span><span class="pt">Self-Hosted</span></div>
+          <a href="#" class="proj-link">View on GitHub →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="sec">
+      <div class="sec-label fi">Experience & Education</div>
+      <h2 class="fi">Where I've been</h2>
+      <div class="exp-list fi2">
+        <div class="exp-item">
+          <div class="exp-date">2024<br/>Batavia, IL</div>
+          <div>
+            <div class="exp-type">Internship</div>
+            <div class="exp-role">Engineering Intern — NPU & Quantum Computing</div>
+            <div class="exp-org">Fermi National Accelerator Laboratory</div>
+            <div class="exp-body">Contributed to NPU development and quantum computing instrumentation at one of the world's leading particle physics labs. The kind of environment where measurement tolerances are not negotiable at any scale.</div>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-date">2022 – Present</div>
+          <div>
+            <div class="exp-type">Leadership</div>
+            <div class="exp-role">Engineering Mentor</div>
+            <div class="exp-org">Community Center · Northern Virginia</div>
+            <div class="exp-body">Weekly engineering program for teenagers covering embedded systems, electronics, and programming. The students have debugged my code more than once. I choose to see that as a success.</div>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-date">2024 – Spring 2026</div>
+          <div>
+            <div class="exp-type">Education</div>
+            <div class="exp-role">B.S. Computer Engineering · GPA 3.95</div>
+            <div class="exp-org">George Mason University · Fairfax, VA</div>
+            <div class="exp-body">Digital design, FPGA systems, computer architecture, embedded programming. Key coursework: ECE 448 (VHDL), ECE 555, DSP, multi-threading, formal verification.</div>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-date">2022 – 2024</div>
+          <div>
+            <div class="exp-type">Education</div>
+            <div class="exp-role">Associate of Science (×2)</div>
+            <div class="exp-org">Northern Virginia Community College · Annandale, VA</div>
+            <div class="exp-body">Dual A.S. degrees in mathematics, physics, and computer science before transferring to GMU.</div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- DriveGuard -->
-    <div class="glass proj-card fi">
-      <div class="proj-top"><span class="proj-num">002</span><span class="proj-status st-done">Completed</span></div>
-      <div class="proj-title">DriveGuard</div>
-      <div class="proj-img">
-        <!-- This is how you add an image — just upload the file to GitHub and update src -->
-        <img src="predator.webp" alt="MQ-1 Predator drone — the kind of system this work supports"/>
-        <div class="proj-img-overlay"></div>
-      </div>
-      <div class="proj-desc">IoT driver safety system detecting drowsiness in real time. Built around one constraint: alert must fire before the brain registers danger.</div>
-      <div class="proj-tags"><span class="pt">IoT</span><span class="pt">Embedded C</span><span class="pt">Edge AI</span><span class="pt">Sensors</span></div>
-      <a href="#" class="proj-link">View on GitHub →</a>
-    </div>
-
-    <!-- Self-hosted -->
-    <div class="glass proj-card fi2">
-      <div class="proj-top"><span class="proj-num">003</span><span class="proj-status st-live">Active</span></div>
-      <div class="proj-title">Self-Hosted Infrastructure</div>
-      <div class="proj-img">
-        <!-- Replace with your actual project photo -->
-        <div class="proj-img-placeholder">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Add project image
+    <!-- AWARDS -->
+    <section id="awards" class="sec">
+      <div class="sec-label fi">Awards & Honors</div>
+      <h2 class="fi">Recognition</h2>
+      <div class="awards-grid fi2">
+        <div class="card aw-card">
+          <div class="aw-icon">★</div>
+          <div><div class="aw-title">Dean's List</div><div class="aw-org">George Mason University</div><div class="aw-desc">Academic excellence every semester. 3.95 cumulative GPA.</div></div>
         </div>
-        <div class="proj-img-overlay"></div>
+        <div class="card aw-card">
+          <div class="aw-icon">◈</div>
+          <div><div class="aw-title">Add your award</div><div class="aw-org">Organization</div><div class="aw-desc">Replace with your real honors, scholarships, or competition wins.</div></div>
+        </div>
+        <div class="card aw-card">
+          <div class="aw-icon">⬡</div>
+          <div><div class="aw-title">Add your award</div><div class="aw-org">Organization</div><div class="aw-desc">Replace with your real honors, scholarships, or competition wins.</div></div>
+        </div>
       </div>
-      <div class="proj-desc">Raspberry Pi CM4 + Coral Edge TPU running local AI inference, file serving, and automation. Built because paying monthly fees to run three containers felt like a moral failure.</div>
-      <div class="proj-tags"><span class="pt">RPi CM4</span><span class="pt">Coral TPU</span><span class="pt">Linux</span><span class="pt">Self-Hosted</span></div>
-      <a href="#" class="proj-link">View on GitHub →</a>
-    </div>
+    </section>
 
-  </div>
+    <!-- FUTURE PLANS -->
+    <section id="plans" class="sec">
+      <div class="sec-label fi">What's Next</div>
+      <h2 class="fi">Future plans</h2>
+      <p class="sec-desc fi">Near term, medium term, and long term.</p>
+      <div class="plans-grid fi2">
+        <div class="card plan-card">
+          <span class="plan-horizon h-now">Now · 2026</span>
+          <div class="plan-title">Graduate & Land a Role</div>
+          <div class="plan-desc">Finishing B.S. at GMU Spring 2026. Actively interviewing for FPGA and embedded roles at defense and aerospace firms in Northern Virginia — Northrop Grumman, Raytheon, Leidos.</div>
+        </div>
+        <div class="card plan-card">
+          <span class="plan-horizon h-next">Next · 2026–2028</span>
+          <div class="plan-title">Georgia Tech OMSCS</div>
+          <div class="plan-desc">Applying to Georgia Tech's Online MSCS to deepen computer systems and AI foundations. Target: complete while working full-time.</div>
+        </div>
+        <div class="card plan-card">
+          <span class="plan-horizon h-future">Future · 2028+</span>
+          <div class="plan-title">Defense-Grade AI Hardware</div>
+          <div class="plan-desc">Long-term goal: contribute to next-generation AI accelerators for defense applications — formal verification, FPGA design, and edge inference at the hardware level.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="sec">
+      <div class="sec-label fi">Contact</div>
+      <h2 class="fi">Let's talk hardware.</h2>
+      <div class="contact-wrap fi2">
+        <div class="contact-left">
+          <p>Open to full-time roles in defense, aerospace, and embedded systems in Northern Virginia. If you're building real hardware and need someone who takes correctness seriously — let's have a conversation.</p>
+          <a href="mailto:your@email.com" class="btn primary">Send an Email</a>
+        </div>
+        <div class="contact-items">
+          <div class="ci"><span class="ci-label">Email</span><a href="mailto:your@email.com" class="ci-val">your@email.com</a></div>
+          <div class="ci"><span class="ci-label">LinkedIn</span><a href="https://linkedin.com/in/yourprofile" class="ci-val">linkedin.com/in/yourprofile</a></div>
+          <div class="ci"><span class="ci-label">GitHub</span><a href="https://github.com/trekker-hub" class="ci-val">github.com/trekker-hub</a></div>
+          <div class="ci"><span class="ci-label">Resume</span><a href="/resume.pdf" class="ci-val">Download PDF ↓</a></div>
+          <div class="ci"><span class="ci-label">Location</span><span class="ci-val">Northern Virginia, USA</span></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
-</section>
-
-<!-- ── EXPERIENCE ── -->
-<section id="experience" class="sec" style="padding-top:0">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">Experience & Education</div>
-    <h2>Where I've been</h2>
-  </div>
-  <div class="exp-list fi2">
-    <div class="exp-item">
-      <div class="exp-date">2024<br/>Batavia, IL</div>
-      <div>
-        <div class="exp-type">Internship</div>
-        <div class="exp-role">Engineering Intern — NPU & Quantum Computing</div>
-        <div class="exp-org">Fermi National Accelerator Laboratory</div>
-        <div class="exp-body">Contributed to NPU development and quantum computing instrumentation at one of the world's leading particle physics labs. Worked on hardware-accelerated pipelines where measurement tolerances are not negotiable at any scale.</div>
-      </div>
-    </div>
-    <div class="exp-item">
-      <div class="exp-date">2022 –<br/>Present</div>
-      <div>
-        <div class="exp-type">Leadership</div>
-        <div class="exp-role">Engineering Mentor</div>
-        <div class="exp-org">Community Center · Northern Virginia</div>
-        <div class="exp-body">Weekly engineering program for teenagers covering embedded systems, electronics, and programming. The students have debugged my code more than once. I choose to see that as a success.</div>
-      </div>
-    </div>
-    <div class="exp-item">
-      <div class="exp-date">2024 –<br/>Spring 2026</div>
-      <div>
-        <div class="exp-type">Education</div>
-        <div class="exp-role">B.S. Computer Engineering · GPA 3.95</div>
-        <div class="exp-org">George Mason University · Fairfax, VA</div>
-        <div class="exp-body">Digital design, FPGA systems, computer architecture, embedded programming. Key coursework: ECE 448 (VHDL), ECE 555, DSP, multi-threading, formal verification.</div>
-      </div>
-    </div>
-    <div class="exp-item">
-      <div class="exp-date">2022 –<br/>2024</div>
-      <div>
-        <div class="exp-type">Education</div>
-        <div class="exp-role">Associate of Science (×2)</div>
-        <div class="exp-org">Northern Virginia Community College · Annandale, VA</div>
-        <div class="exp-body">Dual A.S. degrees in mathematics, physics, and computer science foundations before transferring to GMU.</div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ── AWARDS ── -->
-<section id="awards" class="sec" style="padding-top:0">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">Awards & Honors</div>
-    <h2>Recognition</h2>
-  </div>
-  <div class="awards-grid fi2">
-    <div class="glass aw-card">
-      <div class="aw-icon">★</div>
-      <div>
-        <div class="aw-title">Dean's List</div>
-        <div class="aw-org">George Mason University</div>
-        <div class="aw-desc">Academic excellence every semester at GMU. 3.95 cumulative GPA.</div>
-      </div>
-    </div>
-    <div class="glass aw-card">
-      <div class="aw-icon">◈</div>
-      <div>
-        <div class="aw-title">Add your award here</div>
-        <div class="aw-org">Organization</div>
-        <div class="aw-desc">Replace this with your real honors, scholarships, or competition wins.</div>
-      </div>
-    </div>
-    <div class="glass aw-card">
-      <div class="aw-icon">⬡</div>
-      <div>
-        <div class="aw-title">Add your award here</div>
-        <div class="aw-org">Organization</div>
-        <div class="aw-desc">Replace this with your real honors, scholarships, or competition wins.</div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ── FUTURE PLANS ── -->
-<section id="plans" class="sec" style="padding-top:0">
-<div class="wrap">
-  <div class="fi">
-    <div class="sec-tag">What's Next</div>
-    <h2>Future plans</h2>
-    <p class="sec-desc">Where I'm headed — near term, medium term, and long term.</p>
-  </div>
-  <div class="plans-grid fi2">
-    <div class="glass plan-card">
-      <span class="plan-horizon h-now">Now · 2026</span>
-      <div class="plan-title">Graduate & Land a Role</div>
-      <div class="plan-desc">Finishing B.S. at GMU Spring 2026. Actively interviewing for FPGA / embedded roles at defense and aerospace firms in Northern Virginia — Northrop Grumman, Raytheon, Leidos.</div>
-    </div>
-    <div class="glass plan-card">
-      <span class="plan-horizon h-next">Next · 2026–2028</span>
-      <div class="plan-title">Georgia Tech OMSCS</div>
-      <div class="plan-desc">Accepted / applying to Georgia Tech's Online MSCS program to deepen foundations in computer systems and AI. Target: complete while working full-time.</div>
-    </div>
-    <div class="glass plan-card">
-      <span class="plan-horizon h-future">Future · 2028+</span>
-      <div class="plan-title">Build Defense-Grade AI Hardware</div>
-      <div class="plan-desc">Long-term goal: contribute to next-generation AI accelerators for defense applications — combining formal verification, FPGA design, and edge inference at the hardware level.</div>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ── CONTACT ── -->
-<section id="contact" class="sec" style="padding-top:0;padding-bottom:5rem">
-<div class="wrap">
-  <div class="contact-box fi">
-    <div class="sec-tag" style="justify-content:center">Contact</div>
-    <h2>Let's talk hardware.</h2>
-    <p>Open to full-time roles in defense, aerospace, and embedded systems in Northern Virginia. If you're building something real and need someone who takes correctness seriously — let's have a conversation.</p>
-    <div class="contact-grid">
-      <a href="mailto:your@email.com" class="contact-item"><span class="dot"></span>your@email.com</a>
-      <a href="https://linkedin.com/in/yourprofile" class="contact-item"><span class="dot"></span>LinkedIn</a>
-      <a href="https://github.com/trekker-hub" class="contact-item"><span class="dot"></span>github.com/trekker-hub</a>
-      <a href="/resume.pdf" class="contact-item"><span class="dot"></span>Resume PDF ↓</a>
-    </div>
-    <a href="mailto:your@email.com" class="btn-glass primary">Send an Email</a>
-  </div>
-</div>
-</section>
-
-<!-- ── FOOTER ── -->
-<footer>
-  <p>© 2026 Tarek — trekker-hub.github.io</p>
-  <p>Built with HTML & CSS · No frameworks needed</p>
-</footer>
 
 <script>
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in') });
+// Fade-in
+const obs = new IntersectionObserver(e=>{
+  e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in')})
 },{threshold:0.07});
-document.querySelectorAll('.fi,.fi2,.fi3').forEach(el => obs.observe(el));
+document.querySelectorAll('.fi,.fi2').forEach(el=>obs.observe(el));
 
-document.addEventListener('click', e => {
-  const m = document.getElementById('mn');
-  if(!m.contains(e.target) && !e.target.closest('.hbg')) m.classList.remove('open');
+// Active sidebar link on scroll
+const secs = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.sb-nav a');
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove('active'));
+      const a = document.querySelector(`.sb-nav a[href="#${e.target.id}"]`);
+      if(a) a.classList.add('active');
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+secs.forEach(s=>io.observe(s));
+
+// Mobile menu close
+document.addEventListener('click',e=>{
+  const m=document.getElementById('mm');
+  if(m&&!m.contains(e.target)&&!e.target.closest('.hbg'))m.classList.remove('open');
 });
 </script>
 </body>
