@@ -136,7 +136,7 @@ const SITE = {
       status: "Design complete",
       featured: true,
       detail: true,
-      image: "",
+      image: "images/cubesat/cubesat.png",
       blurb: "An open-source FPGA payload platform for CubeSat missions: a three-layer PCB carrying an Artix-7, its own power distribution and thermal monitoring, and firmware written in Ada/SPARK so the compiler proves the communication drivers correct before anything is flashed. Won first place in the GMU ECE senior design competition.",
       tags: ["VHDL", "Ada/SPARK", "Artix-7", "PCB design", "Formal verification", "I2C / SPI / UART"],
       links: [
@@ -162,7 +162,7 @@ const SITE = {
         { h: "Result" },
         { p: "The PCB design is complete and ready for fabrication and stress testing. The project took first place in the George Mason ECE senior design competition in 2026 and is being carried forward as a shared platform for university-wide Ada/SPARK firmware work." },
 
-        { note: "Add a photo of the board, a block diagram, or a screenshot of the proof output here — see GUIDE.md, section 'Adding a picture'." },
+        { img: "images/cubesat/cubesat-pcb.png", caption: "This is the PCB design of the for power regulation. It handles the entire FPGA and sensors with multiple buses for sensor communication in 2D & 3D" },
       ],
     },
 
