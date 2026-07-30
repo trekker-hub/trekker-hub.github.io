@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project — Tariq Aldalou</title>
+<meta name="description" content="Project write-up.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%2314181A'/><path d='M5 21h5v-8h6v8h5v-4h6' stroke='%23FFD230' stroke-width='2.5' fill='none'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body data-page="project">
+
+<header class="rail">
+  <div class="wrap rail-in">
+    <a class="rail-mark" href="index.html">
+      <b id="mkInit">TA</b>
+      <span id="mkName"></span>
+      <span class="role" id="mkRole"></span>
+    </a>
+    <nav class="rail-nav" aria-label="Sections">
+      <a href="index.html#work">All projects</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="crumb"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="index.html#work">Projects</a></p>
+  <div id="pMain"></div>
+</main>
+
+<div class="wrap"><div class="p-more" id="pMore"></div></div>
+
+<footer class="foot">
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;width:min(100% - 2*var(--pad), var(--wrap))">
+    <span>© <span id="year"></span> <span id="footName"></span></span>
+    <span><a href="index.html">← Back to the site</a></span>
+  </div>
+</footer>
+
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
