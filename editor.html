@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Editor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23161b22'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='%2358a6ff'>✦</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--surf:#161b22;--surf2:#1c2128;--surf3:#21262d;
+  --bdr:#30363d;--bdr2:#21262d;
+  --tx:#e6edf3;--tx2:#8b949e;--tx3:#6e7681;
+  --acc:#388bfd;--acc-bg:rgba(56,139,253,.12);
+  --ok:#3fb950;--warn:#d29922;--err:#f85149;
+  --inp:#0d1117;--rad:6px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;
+  color:var(--tx);background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TOP BAR ─────────────────────────────────────────────────────── */
+.topbar{height:52px;background:var(--surf);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;flex-shrink:0;gap:1rem}
+.topbar-l,.topbar-r{display:flex;align-items:center;gap:.75rem}
+.app-name{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--acc)}
+.folder-tag{font-size:12px;color:var(--tx2);background:var(--surf2);
+  border:1px solid var(--bdr);border-radius:4px;padding:.2rem .6rem;
+  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.save-pill{font-size:12px;padding:.25rem .6rem;border-radius:20px;font-weight:500}
+.save-pill.clean{background:rgba(63,185,80,.12);color:var(--ok)}
+.save-pill.dirty{background:rgba(210,153,34,.12);color:var(--warn)}
+.save-pill.idle{color:var(--tx3)}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────── */
+.btn{padding:.38rem .85rem;border-radius:var(--rad);border:1px solid var(--bdr);
+  background:var(--surf2);color:var(--tx);cursor:pointer;font-size:13px;
+  font-family:inherit;transition:border-color .15s,background .15s;white-space:nowrap}
+.btn:hover{border-color:var(--tx3);background:var(--surf3)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{background:var(--acc);border-color:transparent;color:#fff;font-weight:500}
+.btn-primary:hover{background:#58a6ff;border-color:transparent}
+.btn-sm{padding:.22rem .55rem;font-size:12px}
+.btn-danger{color:var(--err);border-color:rgba(248,81,73,.35)}
+.btn-danger:hover{background:rgba(248,81,73,.1)}
+.icon-btn{padding:.3rem;border:none;background:transparent;cursor:pointer;
+  color:var(--tx2);border-radius:4px;font-size:14px;line-height:1}
+.icon-btn:hover{background:var(--surf2);color:var(--tx)}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────── */
+.sidebar{width:185px;background:var(--surf);border-right:1px solid var(--bdr);
+  padding:.75rem 0;overflow-y:auto;flex-shrink:0}
+.sidebar-lbl{padding:.2rem .9rem;font-size:10px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--tx3);margin-top:.6rem}
+.sidebar a{display:flex;align-items:center;gap:.55rem;padding:.42rem .9rem;
+  color:var(--tx2);text-decoration:none;font-size:13px;
+  border-radius:4px;margin:1px .4rem;transition:background .1s,color .1s}
+.sidebar a:hover{background:var(--surf2);color:var(--tx)}
+.sidebar a.on{background:var(--acc-bg);color:var(--acc);font-weight:500}
+.sidebar a .ic{width:16px;text-align:center;font-style:normal;flex-shrink:0}
+
+/* ── MAIN ────────────────────────────────────────────────────────── */
+.main{flex:1;overflow-y:auto;padding:1.75rem 2rem}
+
+/* ── NO-FOLDER STATE ─────────────────────────────────────────────── */
+.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:1rem;color:var(--tx2);text-align:center}
+.splash-icon{font-size:52px}
+.splash h2{color:var(--tx);font-size:20px;font-weight:600}
+.splash p{max-width:360px;line-height:1.65;font-size:13px}
+.splash-note{font-size:12px;color:var(--tx3);background:var(--surf);
+  border:1px solid var(--bdr);border-radius:6px;padding:.6rem 1rem;margin-top:.25rem}
+
+/* ── SECTION HEADER ──────────────────────────────────────────────── */
+.sec-hd{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr)}
+.sec-hd h2{font-size:17px;font-weight:600;margin-bottom:.25rem}
+.sec-hd p{color:var(--tx2);font-size:13px;line-height:1.5}
+
+/* ── FORM ────────────────────────────────────────────────────────── */
+.field{margin-bottom:1.1rem}
+.field>label{display:block;font-size:13px;font-weight:500;margin-bottom:.38rem;color:var(--tx)}
+.hint{font-size:11px;color:var(--tx3);margin-top:.28rem;line-height:1.5}
+input[type=text],input[type=email],input[type=url],input[type=tel],textarea,select{
+  width:100%;padding:.45rem .7rem;background:var(--inp);border:1px solid var(--bdr);
+  border-radius:var(--rad);color:var(--tx);font-size:13px;font-family:inherit;
+  transition:border-color .15s;outline:none;line-height:1.5}
+input:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(56,139,253,.15)}
+textarea{resize:vertical;min-height:72px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+hr.div{border:none;border-top:1px solid var(--bdr);margin:1.25rem 0}
+
+/* ── CARDS ───────────────────────────────────────────────────────── */
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:.85rem}
+.card-hd{padding:.8rem 1rem;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;gap:.75rem;border-radius:8px;transition:background .1s}
+.card-hd:hover{background:var(--surf2)}
+.card-hd.open{border-bottom:1px solid var(--bdr);border-radius:8px 8px 0 0}
+.card-title{font-weight:500;font-size:13px;flex:1}
+.card-sub{font-size:11px;color:var(--tx2);margin-top:2px}
+.card-actions{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+.card-body{padding:1.1rem}
+.chev{color:var(--tx3);font-size:12px}
+
+/* ── BADGE ───────────────────────────────────────────────────────── */
+.badge{font-size:10px;padding:.1rem .5rem;border-radius:20px;font-weight:600;white-space:nowrap}
+.badge-g{background:rgba(63,185,80,.15);color:var(--ok)}
+.badge-b{background:var(--acc-bg);color:var(--acc)}
+.badge-y{background:rgba(210,153,34,.15);color:var(--warn)}
+
+/* ── TOGGLE ──────────────────────────────────────────────────────── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0}
+.tog-row label.tog-lbl{font-size:13px;color:var(--tx);flex:1}
+.tog{position:relative;width:34px;height:18px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-tk{position:absolute;inset:0;background:var(--bdr);border-radius:18px;cursor:pointer;transition:background .2s}
+.tog input:checked+.tog-tk{background:var(--acc)}
+.tog-tk::after{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform .2s}
+.tog input:checked+.tog-tk::after{transform:translateX(16px)}
+
+/* ── CHIPS ───────────────────────────────────────────────────────── */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:.35rem;padding:.4rem .5rem;
+  background:var(--inp);border:1px solid var(--bdr);border-radius:var(--rad);
+  min-height:38px;align-items:center;cursor:text}
+.chips-wrap:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(56,139,253,.15)}
+.chip{display:flex;align-items:center;gap:.25rem;background:var(--surf2);
+  border:1px solid var(--bdr2);border-radius:20px;padding:.15rem .45rem .15rem .6rem;font-size:12px}
+.chip button{background:none;border:none;cursor:pointer;color:var(--tx3);
+  font-size:13px;padding:0;line-height:1;display:flex;align-items:center}
+.chip button:hover{color:var(--err)}
+.chip-inp{border:none;background:transparent;outline:none;font-size:13px;
+  color:var(--tx);min-width:90px;flex:1;padding:.1rem .2rem}
+
+/* ── LIST ITEMS ──────────────────────────────────────────────────── */
+.list-row{display:flex;gap:.45rem;margin-bottom:.45rem;align-items:flex-start}
+.list-row textarea,.list-row input{flex:1}
+.add-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .75rem;
+  font-size:12px;color:var(--acc);border:1px dashed rgba(56,139,253,.4);
+  background:transparent;border-radius:var(--rad);cursor:pointer;font-family:inherit;
+  margin-top:.25rem;transition:background .15s;white-space:nowrap}
+.add-btn:hover{background:var(--acc-bg)}
+
+/* ── IMAGE ZONE ──────────────────────────────────────────────────── */
+.img-zone{border:2px dashed var(--bdr);border-radius:8px;padding:1.25rem;
+  text-align:center;cursor:pointer;transition:border-color .15s,background .15s;
+  min-height:80px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.5rem}
+.img-zone:hover,.img-zone.over{border-color:var(--acc);background:var(--acc-bg)}
+.img-zone img{max-height:180px;max-width:100%;border-radius:6px}
+.img-zone-txt{font-size:13px;color:var(--tx2)}
+.img-zone-txt strong{color:var(--tx)}
+.img-path{font-size:11px;color:var(--tx3);font-family:monospace}
+.img-zone input[type=file]{display:none}
+
+/* ── BLOCK EDITOR ────────────────────────────────────────────────── */
+.blk{background:var(--inp);border:1px solid var(--bdr2);border-radius:6px;margin-bottom:.45rem}
+.blk-hd{display:flex;align-items:center;gap:.45rem;padding:.4rem .65rem;
+  background:var(--surf2);border-bottom:1px solid var(--bdr2);border-radius:6px 6px 0 0}
+.blk-type{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.1rem .4rem;border-radius:3px;background:var(--acc-bg);color:var(--acc)}
+.blk-preview{flex:1;font-size:11px;color:var(--tx3);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.blk-body{padding:.65rem}
+
+/* ── RADIO ───────────────────────────────────────────────────────── */
+.radio-grp{display:flex;gap:.85rem;flex-wrap:wrap;margin-top:.4rem}
+.radio-opt{display:flex;align-items:center;gap:.38rem;font-size:13px;cursor:pointer}
+.radio-opt input{accent-color:var(--acc)}
+
+/* ── TOAST ───────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:8px;padding:.6rem 1.1rem;
+  font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:999;
+  transition:opacity .25s,transform .25s}
+.toast.hidden{opacity:0;transform:translateY(6px);pointer-events:none}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.bad{border-color:var(--err);color:var(--err)}
+
+@media(max-width:680px){
+  .sidebar{display:none}
+  .grid2,.grid3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-l">
+    <span class="app-name">✦ Site Editor</span>
+    <button class="btn" id="btnOpen">Open Project Folder</button>
+    <span class="folder-tag" id="folderTag" style="display:none"></span>
+  </div>
+  <div class="topbar-r">
+    <span class="save-pill idle" id="savePill">No folder open</span>
+    <button class="btn" id="btnPreview" style="display:none" title="Open site in new tab">Preview ↗</button>
+    <button class="btn btn-primary" id="btnSave" disabled>Save to Disk</button>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-lbl">Identity</div>
+    <a href="#" data-sec="profile"><i class="ic">👤</i>Profile</a>
+    <a href="#" data-sec="links"><i class="ic">🔗</i>Links</a>
+    <div class="sidebar-lbl">Content</div>
+    <a href="#" data-sec="about"><i class="ic">📝</i>About</a>
+    <a href="#" data-sec="projects"><i class="ic">🗂</i>Projects</a>
+    <a href="#" data-sec="experience"><i class="ic">💼</i>Experience</a>
+    <a href="#" data-sec="education"><i class="ic">🎓</i>Education</a>
+    <div class="sidebar-lbl">More</div>
+    <a href="#" data-sec="skills"><i class="ic">⚡</i>Skills</a>
+    <a href="#" data-sec="awards"><i class="ic">🏆</i>Awards</a>
+    <a href="#" data-sec="timeline"><i class="ic">📅</i>Timeline</a>
+    <a href="#" data-sec="next"><i class="ic">🚀</i>What's Next</a>
+    <a href="#" data-sec="footer"><i class="ic">⚙️</i>Footer</a>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+    <!-- Splash shown until folder is opened -->
+    <div class="splash" id="splash">
+      <div class="splash-icon">📁</div>
+      <h2>Open your project folder</h2>
+      <p>Click <strong>Open Project Folder</strong> and select the folder that contains <code>index.html</code>, <code>content.js</code>, and your other site files.</p>
+      <button class="btn btn-primary" style="margin-top:.5rem" onclick="openFolder()">Open Project Folder</button>
+      <p class="splash-note">⚠ Requires Google Chrome (or Edge). Firefox does not support folder access.</p>
+    </div>
+    <!-- Section content rendered here -->
+    <div id="sec" style="display:none"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast"></div>
+
+<script>
+'use strict';
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let dir = null;      // FileSystemDirectoryHandle
+let site = null;     // parsed SITE object (deep clone)
+let dirty = false;
+let activeSec = 'profile';
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+let toastTmr;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = (type === 'ok' ? '✓  ' : '✕  ') + msg;
+  el.className = 'toast ' + type;
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => el.classList.add('hidden'), 3200);
+}
+
+// ─── FILE SYSTEM ─────────────────────────────────────────────────────────────
+async function openFolder() {
+  if (!window.showDirectoryPicker) {
+    alert('Your browser does not support folder access.\nPlease use Google Chrome or Microsoft Edge.');
+    return;
+  }
+  try {
+    dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    document.getElementById('folderTag').textContent = '📂 ' + dir.name;
+    document.getElementById('folderTag').style.display = '';
+    document.getElementById('btnPreview').style.display = '';
+    document.getElementById('btnPreview').onclick = () => {
+      // Try to construct a plausible local URL - won't always work for file://
+      toast('Open index.html in your browser to preview the site.', 'ok');
+    };
+    await loadContent();
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('Could not open folder: ' + e.message, 'bad');
+  }
+}
+
+async function loadContent() {
+  try {
+    const fh = await dir.getFileHandle('content.js');
+    const file = await fh.getFile();
+    const text = await file.text();
+    const fn = new Function(text + '\nreturn SITE;');
+    site = JSON.parse(JSON.stringify(fn())); // deep clone via JSON
+    setDirty(false);
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('sec').style.display = '';
+    document.getElementById('btnSave').disabled = false;
+    setActive(activeSec);
+    toast('content.js loaded');
+  } catch (e) {
+    toast('Could not read content.js: ' + e.message, 'bad');
+    console.error(e);
+  }
+}
+
+async function saveContent() {
+  if (!dir || !site) return;
+  try {
+    const fh = await dir.getFileHandle('content.js', { create: true });
+    const w = await fh.createWritable();
+    await w.write(buildContentJs());
+    await w.close();
+    setDirty(false);
+    toast('Saved successfully');
+  } catch (e) {
+    toast('Save failed: ' + e.message, 'bad');
+    console.error(e);
+  }
+}
+
+async function writeImage(file, projectId) {
+  if (!dir) return null;
+  try {
+    const imgDir = await dir.getDirectoryHandle('images', { create: true });
+    const sub = projectId
+      ? await imgDir.getDirectoryHandle(projectId, { create: true })
+      : imgDir;
+    const fh = await sub.getFileHandle(file.name, { create: true });
+    const w = await fh.createWritable();
+    await w.write(file);
+    await w.close();
+    return projectId ? `images/${projectId}/${file.name}` : `images/${file.name}`;
+  } catch (e) {
+    toast('Image save failed: ' + e.message, 'bad');
+    return null;
+  }
+}
+
+// ─── SERIALIZER ───────────────────────────────────────────────────────────────
+// Converts a value to formatted JavaScript source (not JSON — no quotes on keys)
+function jv(val, depth) {
+  if (val === null || val === undefined) return 'null';
+  if (typeof val === 'boolean' || typeof val === 'number') return String(val);
+  if (typeof val === 'string') return JSON.stringify(val);
+
+  const pad  = '  '.repeat(depth);
+  const pad2 = '  '.repeat(depth + 1);
+
+  if (Array.isArray(val)) {
+    if (!val.length) return '[]';
+    // Short arrays of primitives → one line
+    if (val.every(v => typeof v === 'string' || typeof v === 'number') && val.map(v => JSON.stringify(String(v))).join(', ').length < 80)
+      return '[' + val.map(v => JSON.stringify(String(v))).join(', ') + ']';
+    return '[\n' + val.map(v => pad2 + jv(v, depth + 1)).join(',\n') + ',\n' + pad + ']';
+  }
+
+  if (typeof val === 'object') {
+    const entries = Object.entries(val).filter(([, v]) => v !== undefined);
+    if (!entries.length) return '{}';
+    return '{\n' + entries.map(([k, v]) => pad2 + k + ': ' + jv(v, depth + 1)).join(',\n') + ',\n' + pad + '}';
+  }
+  return String(val);
+}
+
+function buildContentJs() {
+  const S = site;
+  return `/* ============================================================================
+   content.js  —  THIS IS THE ONLY FILE YOU NEED TO EDIT.
+
+   Edited with editor.html — open that file to make changes visually.
+
+   Three rules that will save you every time if you edit by hand:
+     1. Every line inside a { } block ends with a comma ,
+     2. Text always goes inside "double quotes"
+     3. If the site goes blank: press F12 → Console for the error line.
+   ========================================================================== */
+
+const SITE = {
+
+  /* ── 1. WHO YOU ARE ─────────────────────────────────────────────── */
+  profile: ${jv(S.profile, 1)},
+
+  /* ── 2. LINKS ───────────────────────────────────────────────────── */
+  links: ${jv(S.links, 1)},
+
+  /* ── 3. TIMELINE DIAGRAM ────────────────────────────────────────── */
+  timeline: ${jv(S.timeline, 1)},
+
+  /* ── 4. ABOUT ───────────────────────────────────────────────────── */
+  about: ${jv(S.about, 1)},
+
+  facts: ${jv(S.facts, 1)},
+
+  /* ── 5. PROJECTS ────────────────────────────────────────────────── */
+  projects: ${jv(S.projects, 1)},
+
+  /* ── 6. EXPERIENCE ──────────────────────────────────────────────── */
+  experience: ${jv(S.experience, 1)},
+
+  /* ── 7. EDUCATION ───────────────────────────────────────────────── */
+  education: ${jv(S.education, 1)},
+
+  coursework: ${jv(S.coursework, 1)},
+
+  /* ── 8. SKILLS ──────────────────────────────────────────────────── */
+  skills: ${jv(S.skills, 1)},
+
+  /* ── 9. AWARDS ──────────────────────────────────────────────────── */
+  awards: ${jv(S.awards, 1)},
+
+  /* ── 10. WHAT'S NEXT ────────────────────────────────────────────── */
+  next: ${jv(S.next, 1)},
+
+  /* ── 11. FOOTER ─────────────────────────────────────────────────── */
+  footer: ${jv(S.footer, 1)},
+
+};
+`;
+}
+
+// ─── DIRTY / STATUS ──────────────────────────────────────────────────────────
+function setDirty(d) {
+  dirty = d;
+  const p = document.getElementById('savePill');
+  if (!site) { p.textContent = 'No folder open'; p.className = 'save-pill idle'; return; }
+  if (d) { p.textContent = '● Unsaved changes'; p.className = 'save-pill dirty'; }
+  else   { p.textContent = '✓ All saved';        p.className = 'save-pill clean'; }
+}
+function markDirty() { setDirty(true); }
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function setActive(sec) {
+  if (activeSec !== sec) collectSec(activeSec);
+  activeSec = sec;
+  document.querySelectorAll('.sidebar a').forEach(a =>
+    a.classList.toggle('on', a.dataset.sec === sec));
+  renderSec(sec);
+  document.getElementById('main').scrollTop = 0;
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function h(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gv(id) { const e = document.getElementById(id); return e ? e.value : ''; }
+function gc(id) { const e = document.getElementById(id); return e ? e.checked : false; }
+
+function fld(label, inputHtml, hint = '') {
+  return `<div class="field"><label>${label}</label>${inputHtml}${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+}
+function inp(id, val, ph = '') {
+  return `<input type="text" id="${id}" value="${h(val)}" placeholder="${h(ph)}">`;
+}
+function ta(id, val, rows = 3) {
+  return `<textarea id="${id}" rows="${rows}">${h(val)}</textarea>`;
+}
+function tog(id, checked, label) {
+  return `<div class="tog-row"><label class="tog-lbl">${label}</label>
+    <label class="tog"><input type="checkbox" id="${id}"${checked?' checked':''}>
+    <div class="tog-tk"></div></label></div>`;
+}
+function chips(id, items, ph = 'Type and press Enter') {
+  const cs = (items||[]).map((t,i) =>
+    `<div class="chip" data-i="${i}"><span>${h(t)}</span><button type="button" onclick="delChip('${id}',${i})">×</button></div>`
+  ).join('');
+  return `<div class="chips-wrap" id="${id}__c" onclick="document.getElementById('${id}__i').focus()">
+    ${cs}<input class="chip-inp" id="${id}__i" placeholder="${h(ph)}" onkeydown="chipKey(event,'${id}')">
+  </div>`;
+}
+
+// ─── CHIP LOGIC ───────────────────────────────────────────────────────────────
+function chipKey(e, id) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const v = e.target.value.trim().replace(/,$/, '');
+    if (!v) return;
+    chipArr(id).push(v);
+    markDirty();
+    e.target.value = '';
+    rebuildChips(id);
+  } else if (e.key === 'Backspace' && !e.target.value) {
+    const arr = chipArr(id);
+    if (arr.length) { arr.pop(); markDirty(); rebuildChips(id); }
+  }
+}
+function delChip(id, i) {
+  chipArr(id).splice(i, 1);
+  markDirty();
+  rebuildChips(id);
+}
+function rebuildChips(id) {
+  const wrap = document.getElementById(id + '__c');
+  const inp  = document.getElementById(id + '__i');
+  if (!wrap || !inp) return;
+  const arr = chipArr(id);
+  const cs = arr.map((t, i) =>
+    `<div class="chip"><span>${h(t)}</span><button type="button" onclick="delChip('${id}',${i})">×</button></div>`
+  ).join('');
+  wrap.innerHTML = cs + `<input class="chip-inp" id="${id}__i" placeholder="${inp.placeholder}" onkeydown="chipKey(event,'${id}')">`;
+}
+function chipArr(id) {
+  // ids: 'cw' → coursework, 'p{i}_tags' → projects[i].tags, 'sk{i}_items' → skills[i].items
+  if (id === 'cw') return site.coursework;
+  const m1 = id.match(/^p(\d+)_tags$/);  if (m1) return site.projects[+m1[1]].tags;
+  const m2 = id.match(/^sk(\d+)_items$/); if (m2) return site.skills[+m2[1]].items;
+  return [];
+}
+
+// ─── SECTION RENDER DISPATCH ─────────────────────────────────────────────────
+function renderSec(sec) {
+  if (!site) return;
+  const el = document.getElementById('sec');
+  const map = {
+    profile: renderProfile, links: renderLinks, about: renderAbout,
+    projects: renderProjects, experience: renderExp, education: renderEdu,
+    skills: renderSkills, awards: renderAwards, timeline: renderTimeline,
+    next: renderNext, footer: renderFooter,
+  };
+  el.innerHTML = (map[sec] || (() => ''))();
+  bindInputs(sec);
+}
+
+function bindInputs(sec) {
+  document.querySelectorAll('#sec input:not([type=file]):not([type=checkbox]):not([type=radio]), #sec textarea, #sec select')
+    .forEach(el => el.addEventListener('input', () => { markDirty(); collectSec(sec); }));
+  document.querySelectorAll('#sec input[type=checkbox], #sec input[type=radio]')
+    .forEach(el => el.addEventListener('change', () => { markDirty(); collectSec(sec); }));
+}
+
+// ─── COLLECT DISPATCH ─────────────────────────────────────────────────────────
+function collectSec(sec) {
+  if (!site) return;
+  const map = {
+    profile: collectProfile, links: collectLinks, about: collectAbout,
+    projects: collectProjects, experience: collectExp, education: collectEdu,
+    skills: collectSkills, awards: collectAwards, timeline: collectTimeline,
+    next: collectNext, footer: collectFooter,
+  };
+  (map[sec] || (() => {}))();
+}
+
+// ─── CARD TOGGLE ─────────────────────────────────────────────────────────────
+function toggleCard(bodyId, headId, chevId) {
+  const body = document.getElementById(bodyId);
+  const head = document.getElementById(headId);
+  const chev = document.getElementById(chevId);
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  if (head) head.classList.toggle('open', !open);
+  if (chev) chev.textContent = open ? '▸' : '▾';
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: PROFILE
+// ═════════════════════════════════════════════════════════════════════════════
+function renderProfile() {
+  const p = site.profile;
+  return `<div class="sec-hd"><h2>Profile</h2><p>Your name, title, and the text shown at the top of the page.</p></div>
+  <div class="grid2">
+    ${fld('Full name', inp('p_name', p.name), 'Shown in the header and hero')}
+    ${fld('Initials', inp('p_initials', p.initials), '2-letter monogram in top-left')}
+  </div>
+  <div class="grid2">
+    ${fld('Job title', inp('p_role', p.role))}
+    ${fld('Location', inp('p_loc', p.location), 'E.g. "Northern Virginia, USA"')}
+  </div>
+  ${fld('Tagline', ta('p_tag', p.tagline, 3), 'The big sentence under your name on the homepage')}
+  ${fld('Subline', ta('p_sub', p.subline, 2), 'Smaller line below the tagline — degree, availability')}
+  <hr class="div">
+  <div class="field">
+    <label>Availability status <span style="font-weight:normal;color:var(--tx3)">(the blinking dot in the corner)</span></label>
+    <div class="radio-grp">
+      <label class="radio-opt"><input type="radio" name="p_st" value="open" ${p.status==='open'?'checked':''}> 🟢 Open to work</label>
+      <label class="radio-opt"><input type="radio" name="p_st" value="busy" ${p.status==='busy'?'checked':''}> 🟡 Busy</label>
+      <label class="radio-opt"><input type="radio" name="p_st" value="off"  ${p.status==='off' ?'checked':''}> ⚫ Not available</label>
+    </div>
+  </div>
+  ${fld('Status label text', inp('p_stTxt', p.statusText), 'Text next to the dot, e.g. "Open to work"')}`;
+}
+function collectProfile() {
+  const p = site.profile;
+  p.name = gv('p_name'); p.initials = gv('p_initials');
+  p.role = gv('p_role'); p.location = gv('p_loc');
+  p.tagline = gv('p_tag'); p.subline = gv('p_sub');
+  p.statusText = gv('p_stTxt');
+  const r = document.querySelector('input[name="p_st"]:checked');
+  if (r) p.status = r.value;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: LINKS
+// ═════════════════════════════════════════════════════════════════════════════
+function renderLinks() {
+  const l = site.links;
+  return `<div class="sec-hd"><h2>Links</h2><p>Leave a field blank to hide that button from the site.</p></div>
+  ${fld('Email address', `<input type="email" id="l_email" value="${h(l.email)}">`)}
+  ${fld('GitHub URL', `<input type="url" id="l_gh" value="${h(l.github)}" placeholder="https://github.com/...">`)}
+  ${fld('LinkedIn URL', `<input type="url" id="l_li" value="${h(l.linkedin)}" placeholder="https://linkedin.com/in/...">`)}
+  ${fld('Resume filename', inp('l_res', l.resume), 'The PDF file that sits in your project folder, e.g. resume.pdf')}
+  ${fld('Phone', `<input type="tel" id="l_ph" value="${h(l.phone)}" placeholder="Leave blank to keep private">`)}`;
+}
+function collectLinks() {
+  const l = site.links;
+  l.email = gv('l_email'); l.github = gv('l_gh');
+  l.linkedin = gv('l_li'); l.resume = gv('l_res'); l.phone = gv('l_ph');
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: ABOUT
+// ═════════════════════════════════════════════════════════════════════════════
+function renderAbout() {
+  const paras = (site.about || []).map((p, i) => `
+    <div class="list-row">
+      <textarea id="ab_p${i}" rows="3">${h(p)}</textarea>
+      <button class="icon-btn" onclick="rmAboutPara(${i})" title="Remove">🗑</button>
+    </div>`).join('');
+
+  const facts = (site.facts || []).map((f, i) => `
+    <div class="list-row" style="align-items:center">
+      <input type="text" id="fk${i}" value="${h(f.k)}" placeholder="Label" style="flex:.4">
+      <input type="text" id="fv${i}" value="${h(f.v)}" placeholder="Value" style="flex:1">
+      <button class="icon-btn" onclick="rmFact(${i})">🗑</button>
+    </div>`).join('');
+
+  return `<div class="sec-hd"><h2>About</h2><p>The paragraphs and fact chips shown on your homepage.</p></div>
+  <div class="field"><label>Paragraphs</label>
+    <div id="ab_paras">${paras}</div>
+    <button class="add-btn" onclick="addAboutPara()">+ Add paragraph</button>
+  </div>
+  <hr class="div">
+  <div class="field"><label>Fact chips <span style="font-weight:normal;color:var(--tx3)">(shown beside About text)</span></label>
+    <div id="ab_facts">${facts}</div>
+    <button class="add-btn" onclick="addFact()">+ Add fact</button>
+  </div>`;
+}
+function collectAbout() {
+  site.about = (site.about || []).map((_, i) => gv(`ab_p${i}`));
+  site.facts  = (site.facts  || []).map((_, i) => ({ k: gv(`fk${i}`), v: gv(`fv${i}`) }));
+}
+function addAboutPara()  { collectAbout(); site.about.push(''); markDirty(); renderSec('about'); }
+function rmAboutPara(i)  { collectAbout(); site.about.splice(i,1); markDirty(); renderSec('about'); }
+function addFact()       { collectAbout(); site.facts.push({k:'',v:''}); markDirty(); renderSec('about'); }
+function rmFact(i)       { collectAbout(); site.facts.splice(i,1); markDirty(); renderSec('about'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: PROJECTS
+// ═════════════════════════════════════════════════════════════════════════════
+function renderProjects() {
+  const cards = (site.projects || []).map(projCard).join('');
+  return `<div class="sec-hd"><h2>Projects</h2><p>Click a card to expand and edit. Drag images straight into the image zone.</p></div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addProject()">+ New project</button>
+  ${cards}`;
+}
+
+function projCard(p, i) {
+  const sc = p.status && (p.status.toLowerCase().includes('active') || p.status.toLowerCase().includes('ongoing'))
+    ? 'badge-b' : p.status && (p.status.toLowerCase().includes('complete') || p.status.toLowerCase().includes('design'))
+    ? 'badge-g' : 'badge-y';
+
+  // blocks
+  const blkHtml = (p.blocks || []).map((b, bi) => blkCard(b, i, bi)).join('');
+  // links
+  const linksHtml = (p.links || []).map((l, li) => `
+    <div class="list-row" style="align-items:center">
+      <input type="text" id="pl${i}_${li}_lbl" value="${h(l.label)}" placeholder="Label" style="flex:.35">
+      <input type="url"  id="pl${i}_${li}_url" value="${h(l.url)}"   placeholder="https://..." style="flex:1">
+      <button class="icon-btn" onclick="rmProjLink(${i},${li})">🗑</button>
+    </div>`).join('');
+  // image preview
+  const imgInner = p.image
+    ? `<img src="${h(p.image)}" onerror="this.style.display='none'" loading="lazy"><div class="img-path">${h(p.image)}</div>`
+    : `<div class="img-zone-txt"><strong>Drop image here</strong> or click to browse</div><div class="img-path">No image set</div>`;
+
+  return `<div class="card" id="pc${i}">
+    <div class="card-hd" id="pch${i}" onclick="toggleCard('pcb${i}','pch${i}','pchev${i}')">
+      <div style="flex:1">
+        <div class="card-title">${h(p.title)||'(untitled)'}</div>
+        <div class="card-sub">${h(p.period)}</div>
+      </div>
+      <div class="card-actions">
+        ${p.featured ? '<span class="badge badge-b">Featured</span>' : ''}
+        <span class="badge ${sc}">${h(p.status||'')}</span>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmProject(${i})">Remove</button>
+        <span class="chev" id="pchev${i}">▸</span>
+      </div>
+    </div>
+    <div class="card-body" id="pcb${i}" style="display:none">
+      <div class="grid2">
+        ${fld('Project ID', inp(`pid${i}`, p.id, 'cubesat'), 'Short slug, no spaces — used in the URL')}
+        ${fld('Status badge', inp(`pst${i}`, p.status, 'Complete'))}
+      </div>
+      ${fld('Title', inp(`ptit${i}`, p.title))}
+      ${fld('Subtitle', inp(`psub${i}`, p.subtitle))}
+      ${fld('Period', inp(`pper${i}`, p.period, 'Fall 2025 – Spring 2026'))}
+      ${fld('Summary blurb', ta(`pblurb${i}`, p.blurb, 4), 'The description shown on the homepage cards')}
+      <div class="grid2">
+        ${tog(`pfeat${i}`, p.featured, 'Featured (shown prominently on homepage)')}
+        ${tog(`pdet${i}`, p.detail, 'Has its own detail page')}
+      </div>
+      <hr class="div">
+      ${fld('Tech tags', chips(`p${i}_tags`, p.tags), 'Press Enter or comma after each tag')}
+      <hr class="div">
+      <div class="field"><label>Hero image</label>
+        <div class="img-zone" id="piz${i}"
+          ondragover="izOver(event)" ondragleave="izLeave(event)" ondrop="izDrop(event,${i})"
+          onclick="document.getElementById('pif${i}').click()">
+          ${imgInner}
+          <input type="file" id="pif${i}" accept="image/*" onchange="imgChange(event,${i})">
+        </div>
+        ${p.image ? `<button class="btn btn-sm" style="margin-top:.4rem" onclick="clearImg(${i})">Remove image</button>` : ''}
+      </div>
+      <hr class="div">
+      <div class="field"><label>External links</label>
+        <div id="pl${i}">${linksHtml}</div>
+        <button class="add-btn" onclick="addProjLink(${i})">+ Add link</button>
+      </div>
+      <hr class="div">
+      <div class="field"><label>Page content blocks <span style="font-weight:normal;color:var(--tx3)">— build the project detail page</span></label>
+        <div class="hint" style="margin-bottom:.65rem">Add headings, paragraphs, bullet lists, images, and notes to build the project's write-up page.</div>
+        <div id="pblk${i}">${blkHtml}</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+          <button class="add-btn" onclick="addBlk(${i},'h')">+ Heading</button>
+          <button class="add-btn" onclick="addBlk(${i},'p')">+ Paragraph</button>
+          <button class="add-btn" onclick="addBlk(${i},'list')">+ Bullet list</button>
+          <button class="add-btn" onclick="addBlk(${i},'img')">+ Image</button>
+          <button class="add-btn" onclick="addBlk(${i},'note')">+ Note</button>
+          <button class="add-btn" onclick="addBlk(${i},'code')">+ Code</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function blkCard(b, pi, bi) {
+  let type, preview, body;
+  if ('h' in b)    { type='HEADING';   preview=b.h;             body=`<input type="text" id="bh${pi}_${bi}" value="${h(b.h)}" placeholder="Heading text">`; }
+  else if ('p' in b)    { type='PARAGRAPH'; preview=b.p.slice(0,70); body=`<textarea id="bp${pi}_${bi}" rows="3">${h(b.p)}</textarea>`; }
+  else if ('note' in b) { type='NOTE';      preview=b.note.slice(0,60); body=`<textarea id="bn${pi}_${bi}" rows="2">${h(b.note)}</textarea>`; }
+  else if ('code' in b) { type='CODE';      preview=b.code.slice(0,50); body=`<textarea id="bc${pi}_${bi}" rows="4" style="font-family:monospace;font-size:12px">${h(b.code)}</textarea>`; }
+  else if ('img' in b) {
+    type='IMAGE'; preview=b.img||'(no path set)';
+    body=`${fld('Image path', inp(`bi${pi}_${bi}`, b.img, 'images/folder/photo.jpg'))}${fld('Caption', inp(`bic${pi}_${bi}`, b.caption||''))}`;
+  }
+  else if ('list' in b) {
+    type='LIST'; preview=`${b.list.length} items`;
+    const items = b.list.map((itm, li) => `
+      <div class="list-row">
+        <input type="text" id="bl${pi}_${bi}_${li}" value="${h(itm)}">
+        <button class="icon-btn" onclick="rmBlkItem(${pi},${bi},${li})">🗑</button>
+      </div>`).join('');
+    body=`<div id="bli${pi}_${bi}">${items}</div><button class="add-btn" onclick="addBlkItem(${pi},${bi})">+ Add item</button>`;
+  }
+  else { type='?'; preview=''; body=''; }
+
+  return `<div class="blk" id="blkw${pi}_${bi}">
+    <div class="blk-hd">
+      <span class="blk-type">${type}</span>
+      <span class="blk-preview">${h(preview||'')}</span>
+      <button class="icon-btn" title="Move up"   onclick="moveBlk(${pi},${bi},-1)">↑</button>
+      <button class="icon-btn" title="Move down" onclick="moveBlk(${pi},${bi},1)">↓</button>
+      <button class="icon-btn" title="Remove"    onclick="rmBlk(${pi},${bi})">🗑</button>
+    </div>
+    <div class="blk-body">${body}</div>
+  </div>`;
+}
+
+function collectProjects() {
+  (site.projects || []).forEach((p, i) => {
+    p.id       = gv(`pid${i}`);
+    p.title    = gv(`ptit${i}`);
+    p.subtitle = gv(`psub${i}`);
+    p.period   = gv(`pper${i}`);
+    p.status   = gv(`pst${i}`);
+    p.blurb    = gv(`pblurb${i}`);
+    p.featured = gc(`pfeat${i}`);
+    p.detail   = gc(`pdet${i}`);
+    (p.links || []).forEach((l, li) => { l.label = gv(`pl${i}_${li}_lbl`); l.url = gv(`pl${i}_${li}_url`); });
+    (p.blocks || []).forEach((b, bi) => {
+      if ('h'    in b) b.h    = gv(`bh${i}_${bi}`);
+      if ('p'    in b) b.p    = gv(`bp${i}_${bi}`);
+      if ('note' in b) b.note = gv(`bn${i}_${bi}`);
+      if ('code' in b) b.code = gv(`bc${i}_${bi}`);
+      if ('img'  in b) { b.img = gv(`bi${i}_${bi}`); b.caption = gv(`bic${i}_${bi}`); }
+      if ('list' in b) b.list = b.list.map((_, li) => gv(`bl${i}_${bi}_${li}`)).filter(Boolean);
+    });
+  });
+}
+
+function addProject() {
+  site.projects.push({ id:'new-project', title:'New Project', subtitle:'', period:'',
+    status:'In progress', featured:false, detail:true, image:'', blurb:'', tags:[], links:[], blocks:[] });
+  markDirty(); renderSec('projects');
+}
+function rmProject(i) {
+  if (!confirm('Remove this project?')) return;
+  collectProjects(); site.projects.splice(i, 1); markDirty(); renderSec('projects');
+}
+function addProjLink(i) {
+  collectProjects(); site.projects[i].links.push({label:'',url:''}); markDirty(); renderSec('projects');
+}
+function rmProjLink(pi, li) {
+  collectProjects(); site.projects[pi].links.splice(li,1); markDirty(); renderSec('projects');
+}
+function addBlk(pi, type) {
+  collectProjects();
+  const b = type==='h' ? {h:'New heading'} : type==='p' ? {p:'Paragraph text.'} :
+            type==='list' ? {list:['First item']} : type==='img' ? {img:'',caption:''} :
+            type==='note' ? {note:'Note text'} : {code:''};
+  site.projects[pi].blocks.push(b);
+  markDirty(); renderSec('projects');
+  // Re-open the card automatically
+  setTimeout(() => {
+    if (document.getElementById(`pcb${pi}`)?.style.display === 'none')
+      toggleCard(`pcb${pi}`, `pch${pi}`, `pchev${pi}`);
+  }, 20);
+}
+function rmBlk(pi, bi) {
+  collectProjects(); site.projects[pi].blocks.splice(bi,1); markDirty(); renderSec('projects');
+}
+function moveBlk(pi, bi, dir) {
+  collectProjects();
+  const blks = site.projects[pi].blocks;
+  const ni = bi + dir;
+  if (ni < 0 || ni >= blks.length) return;
+  [blks[bi], blks[ni]] = [blks[ni], blks[bi]];
+  markDirty(); renderSec('projects');
+}
+function addBlkItem(pi, bi) {
+  collectProjects(); site.projects[pi].blocks[bi].list.push('New item'); markDirty(); renderSec('projects');
+}
+function rmBlkItem(pi, bi, li) {
+  collectProjects(); site.projects[pi].blocks[bi].list.splice(li,1); markDirty(); renderSec('projects');
+}
+
+// Image handling
+function izOver(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+function izLeave(e) { e.currentTarget.classList.remove('over'); }
+async function izDrop(e, pi) {
+  e.preventDefault(); e.currentTarget.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file?.type.startsWith('image/')) await handleImg(file, pi);
+}
+function imgChange(e, pi) {
+  const file = e.target.files[0];
+  if (file) handleImg(file, pi);
+}
+async function handleImg(file, pi) {
+  collectProjects();
+  const projId = site.projects[pi].id || `project-${pi}`;
+  let path = await writeImage(file, projId);
+  if (!path) path = `images/${projId}/${file.name}`;
+  site.projects[pi].image = path;
+  markDirty();
+  const zone = document.getElementById(`piz${pi}`);
+  if (zone) {
+    const url = URL.createObjectURL(file);
+    zone.innerHTML = `<img src="${url}" style="max-height:180px;max-width:100%;border-radius:6px">
+      <div class="img-path">${h(path)}</div>
+      <input type="file" id="pif${pi}" accept="image/*" onchange="imgChange(event,${pi})">`;
+  }
+  toast(`Image saved → ${path}`);
+}
+function clearImg(pi) {
+  collectProjects(); site.projects[pi].image = ''; markDirty(); renderSec('projects');
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: EXPERIENCE
+// ═════════════════════════════════════════════════════════════════════════════
+function renderExp() {
+  const cards = (site.experience || []).map((x, i) => {
+    const pts = (x.points || []).map((pt, pi) => `
+      <div class="list-row"><textarea id="ept${i}_${pi}" rows="2">${h(pt)}</textarea>
+        <button class="icon-btn" onclick="rmExpPt(${i},${pi})">🗑</button></div>`).join('');
+    return `<div class="card">
+      <div class="card-hd" id="exh${i}" onclick="toggleCard('exb${i}','exh${i}','exch${i}')">
+        <div style="flex:1"><div class="card-title">${h(x.role)||'(untitled)'}</div>
+          <div class="card-sub">${h(x.org)} · ${h(x.period)}</div></div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmExp(${i})">Remove</button>
+          <span class="chev" id="exch${i}">▸</span></div>
+      </div>
+      <div class="card-body" id="exb${i}" style="display:none">
+        <div class="grid2">
+          ${fld('Job title / Role', inp(`er${i}`, x.role))}
+          ${fld('Period', inp(`ep${i}`, x.period, 'Jan 2024 – present'))}
+        </div>
+        ${fld('Organization', inp(`eo${i}`, x.org))}
+        ${fld('Location', inp(`el${i}`, x.place||''))}
+        <div class="field"><label>Bullet points</label>
+          <div id="epts${i}">${pts}</div>
+          <button class="add-btn" onclick="addExpPt(${i})">+ Add point</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="sec-hd"><h2>Experience</h2><p>Work, research, and teaching. Newest first.</p></div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addExp()">+ Add position</button>${cards}`;
+}
+function collectExp() {
+  (site.experience || []).forEach((x, i) => {
+    x.role = gv(`er${i}`); x.org = gv(`eo${i}`); x.place = gv(`el${i}`); x.period = gv(`ep${i}`);
+    x.points = (x.points || []).map((_, pi) => gv(`ept${i}_${pi}`)).filter(Boolean);
+  });
+}
+function addExp()        { site.experience.unshift({role:'',org:'',place:'',period:'',points:[]}); markDirty(); renderSec('experience'); }
+function rmExp(i)        { if (!confirm('Remove?')) return; collectExp(); site.experience.splice(i,1); markDirty(); renderSec('experience'); }
+function addExpPt(i)     { collectExp(); site.experience[i].points.push(''); markDirty(); renderSec('experience'); }
+function rmExpPt(ei, pi) { collectExp(); site.experience[ei].points.splice(pi,1); markDirty(); renderSec('experience'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: EDUCATION
+// ═════════════════════════════════════════════════════════════════════════════
+function renderEdu() {
+  const cards = (site.education || []).map((e, i) => `
+    <div class="card">
+      <div class="card-hd" id="edh${i}" onclick="toggleCard('edb${i}','edh${i}','edch${i}')">
+        <div style="flex:1"><div class="card-title">${h(e.school)}</div>
+          <div class="card-sub">${h(e.degree)} · ${h(e.period)}</div></div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmEdu(${i})">Remove</button>
+          <span class="chev" id="edch${i}">▸</span></div>
+      </div>
+      <div class="card-body" id="edb${i}" style="display:none">
+        <div class="grid2">
+          ${fld('School name', inp(`esc${i}`, e.school))}
+          ${fld('Location', inp(`esloc${i}`, e.place||''))}
+        </div>
+        <div class="grid2">
+          ${fld('Degree', inp(`edg${i}`, e.degree))}
+          ${fld('Period', inp(`epr${i}`, e.period))}
+        </div>
+        ${fld('Details / GPA / Honors', inp(`edt${i}`, e.detail||''), 'E.g. GPA 3.95 · Dean\'s List · NVTC Scholarship')}
+      </div>
+    </div>`).join('');
+  return `<div class="sec-hd"><h2>Education</h2></div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addEdu()">+ Add school</button>
+  ${cards}
+  <hr class="div">
+  <div class="field"><label>Coursework <span style="font-weight:normal;color:var(--tx3)">(notable courses worth listing)</span></label>
+    <div class="hint" style="margin-bottom:.5rem">Press Enter or comma after each course name.</div>
+    ${chips('cw', site.coursework)}
+  </div>`;
+}
+function collectEdu() {
+  (site.education || []).forEach((e, i) => {
+    e.school = gv(`esc${i}`); e.place = gv(`esloc${i}`);
+    e.degree = gv(`edg${i}`); e.period = gv(`epr${i}`); e.detail = gv(`edt${i}`);
+  });
+}
+function addEdu()  { site.education.unshift({school:'',place:'',degree:'',period:'',detail:''}); markDirty(); renderSec('education'); }
+function rmEdu(i)  { if (!confirm('Remove?')) return; collectEdu(); site.education.splice(i,1); markDirty(); renderSec('education'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: SKILLS
+// ═════════════════════════════════════════════════════════════════════════════
+function renderSkills() {
+  const groups = (site.skills || []).map((g, gi) => `
+    <div class="card">
+      <div class="card-hd" id="skh${gi}" onclick="toggleCard('skb${gi}','skh${gi}','skch${gi}')">
+        <div style="flex:1"><div class="card-title">${h(g.group)}</div>
+          <div class="card-sub">${(g.items||[]).length} skills</div></div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmSkGrp(${gi})">Remove</button>
+          <span class="chev" id="skch${gi}">▸</span></div>
+      </div>
+      <div class="card-body" id="skb${gi}" style="display:none">
+        ${fld('Group name', inp(`skn${gi}`, g.group))}
+        ${fld('Skills', chips(`sk${gi}_items`, g.items), 'Press Enter or comma after each skill')}
+      </div>
+    </div>`).join('');
+  return `<div class="sec-hd"><h2>Skills</h2><p>Organized into groups. Each skill shows as a chip tag.</p></div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addSkGrp()">+ Add group</button>${groups}`;
+}
+function collectSkills() {
+  (site.skills || []).forEach((g, gi) => { g.group = gv(`skn${gi}`); });
+}
+function addSkGrp() { site.skills.push({group:'New group',items:[]}); markDirty(); renderSec('skills'); }
+function rmSkGrp(gi) { if (!confirm('Remove group?')) return; collectSkills(); site.skills.splice(gi,1); markDirty(); renderSec('skills'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: AWARDS
+// ═════════════════════════════════════════════════════════════════════════════
+function renderAwards() {
+  const rows = (site.awards || []).map((a, i) => `
+    <div class="list-row" style="align-items:center">
+      <input type="text" id="ay${i}" value="${h(a.year)}" style="flex:.18;min-width:58px" placeholder="2026">
+      <input type="text" id="at${i}" value="${h(a.title)}" style="flex:1" placeholder="Award title">
+      <input type="text" id="ao${i}" value="${h(a.org)}"   style="flex:.7" placeholder="Organization">
+      <button class="icon-btn" onclick="rmAward(${i})">🗑</button>
+    </div>`).join('');
+  return `<div class="sec-hd"><h2>Awards</h2><p>Year · Title · Organization. Newest first.</p></div>
+  <div id="aw_list">${rows}</div>
+  <button class="add-btn" onclick="addAward()">+ Add award</button>`;
+}
+function collectAwards() {
+  (site.awards || []).forEach((a, i) => { a.year = gv(`ay${i}`); a.title = gv(`at${i}`); a.org = gv(`ao${i}`); });
+}
+function addAward() {
+  collectAwards();
+  site.awards.unshift({year: new Date().getFullYear().toString(), title:'', org:''});
+  markDirty(); renderSec('awards');
+}
+function rmAward(i) { collectAwards(); site.awards.splice(i,1); markDirty(); renderSec('awards'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: TIMELINE
+// ═════════════════════════════════════════════════════════════════════════════
+function renderTimeline() {
+  const tl = site.timeline || {};
+  const chans = (tl.channels || []).map((ch, ci) => {
+    const segs = (ch.segments || []).map((s, si) => `
+      <div class="list-row" style="align-items:center;background:var(--inp);padding:.35rem;border-radius:4px;margin-bottom:.35rem">
+        <input type="text" id="tls${ci}_${si}_lbl" value="${h(s.label)}" placeholder="Label" style="flex:1">
+        <input type="text" id="tls${ci}_${si}_st"  value="${h(s.start)}" placeholder="YYYY-MM" style="flex:.3;min-width:88px">
+        <input type="text" id="tls${ci}_${si}_en"  value="${h(s.end)}"   placeholder="YYYY-MM / now" style="flex:.32;min-width:96px">
+        <button class="icon-btn" onclick="rmSeg(${ci},${si})">🗑</button>
+      </div>`).join('');
+    return `<div class="card">
+      <div class="card-hd" id="tlh${ci}" onclick="toggleCard('tlb${ci}','tlh${ci}','tlch${ci}')">
+        <div style="flex:1"><div class="card-title">${h(ch.name)}</div>
+          <div class="card-sub">${(ch.segments||[]).length} segments</div></div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmChan(${ci})">Remove</button>
+          <span class="chev" id="tlch${ci}">▸</span></div>
+      </div>
+      <div class="card-body" id="tlb${ci}" style="display:none">
+        ${fld('Channel name', inp(`tln${ci}`, ch.name, 'SCHOOL'), 'All-caps looks best')}
+        <div class="field"><label>Segments <span style="font-weight:normal;color:var(--tx3)">Label · Start (YYYY-MM) · End (YYYY-MM or "now")</span></label>
+          <div id="tlsegs${ci}">${segs}</div>
+          <button class="add-btn" onclick="addSeg(${ci})">+ Add segment</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="sec-hd"><h2>Timeline Diagram</h2><p>The animated graphic at the top of your homepage showing school, work, and projects over time.</p></div>
+  <div class="grid2" style="margin-bottom:1rem">
+    ${fld('Start year', inp('tl_sy', tl.startYear||'', '2022'))}
+    ${fld('End year',   inp('tl_ey', tl.endYear||'',   '2029'))}
+  </div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addChan()">+ Add channel</button>
+  ${chans}`;
+}
+function collectTimeline() {
+  const tl = site.timeline;
+  const sy = +gv('tl_sy'); if (sy) tl.startYear = sy;
+  const ey = +gv('tl_ey'); if (ey) tl.endYear = ey;
+  (tl.channels || []).forEach((ch, ci) => {
+    ch.name = gv(`tln${ci}`);
+    (ch.segments || []).forEach((s, si) => {
+      s.label = gv(`tls${ci}_${si}_lbl`);
+      s.start = gv(`tls${ci}_${si}_st`);
+      s.end   = gv(`tls${ci}_${si}_en`);
+    });
+  });
+}
+function addChan() { collectTimeline(); site.timeline.channels.push({name:'NEW',segments:[]}); markDirty(); renderSec('timeline'); }
+function rmChan(ci) { if (!confirm('Remove channel?')) return; collectTimeline(); site.timeline.channels.splice(ci,1); markDirty(); renderSec('timeline'); }
+function addSeg(ci) { collectTimeline(); site.timeline.channels[ci].segments.push({label:'',start:'',end:'now'}); markDirty(); renderSec('timeline'); }
+function rmSeg(ci, si) { collectTimeline(); site.timeline.channels[ci].segments.splice(si,1); markDirty(); renderSec('timeline'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: WHAT'S NEXT
+// ═════════════════════════════════════════════════════════════════════════════
+function renderNext() {
+  const cards = (site.next || []).map((n, i) => `
+    <div class="card">
+      <div class="card-hd" id="nxh${i}" onclick="toggleCard('nxb${i}','nxh${i}','nxch${i}')">
+        <div style="flex:1"><div class="card-title">${h(n.title)||'(untitled)'}</div>
+          <div class="card-sub">${h(n.when)}</div></div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();rmNext(${i})">Remove</button>
+          <span class="chev" id="nxch${i}">▸</span></div>
+      </div>
+      <div class="card-body" id="nxb${i}" style="display:none">
+        <div class="grid2">
+          ${fld('When', inp(`nxw${i}`, n.when, 'Now / Fall 2026 / Ongoing'))}
+          ${fld('Title', inp(`nxt${i}`, n.title))}
+        </div>
+        ${fld('Body', ta(`nxb_${i}`, n.body, 3))}
+      </div>
+    </div>`).join('');
+  return `<div class="sec-hd"><h2>What's Next</h2><p>Short forward-looking cards near the bottom of the page.</p></div>
+  <button class="add-btn" style="margin-bottom:1rem" onclick="addNext()">+ Add card</button>${cards}`;
+}
+function collectNext() {
+  (site.next || []).forEach((n, i) => { n.when = gv(`nxw${i}`); n.title = gv(`nxt${i}`); n.body = gv(`nxb_${i}`); });
+}
+function addNext()  { site.next.push({when:'',title:'',body:''}); markDirty(); renderSec('next'); }
+function rmNext(i)  { collectNext(); site.next.splice(i,1); markDirty(); renderSec('next'); }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  SECTION: FOOTER
+// ═════════════════════════════════════════════════════════════════════════════
+function renderFooter() {
+  return `<div class="sec-hd"><h2>Footer</h2></div>
+  ${fld('Footer note', ta('fn', site.footer?.note||'', 2), 'Small text at the very bottom of the page')}`;
+}
+function collectFooter() {
+  if (!site.footer) site.footer = {};
+  site.footer.note = gv('fn');
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  BOOT
+// ═════════════════════════════════════════════════════════════════════════════
+document.getElementById('btnOpen').addEventListener('click', openFolder);
+document.getElementById('btnSave').addEventListener('click', saveContent);
+
+document.querySelectorAll('.sidebar a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    if (!site) return;
+    collectSec(activeSec); // save pending changes before switching
+    setActive(a.dataset.sec);
+  });
+});
+
+// Ctrl+S / Cmd+S to save
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (site && dir) saveContent();
+  }
+});
+
+// Warn if closing with unsaved changes
+window.addEventListener('beforeunload', e => {
+  if (dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
