@@ -686,3 +686,60 @@ a:hover { color: var(--signal-dk); }
   body { background: #fff; color: #000; }
   .sec { break-inside: avoid; }
 }
+
+/* ============================================================= dark mode == */
+[data-theme="dark"] {
+  --panel:      #14191C;
+  --panel-2:    #1A2024;
+  --panel-3:    #1F262A;
+  --ink:        #C8D4D8;
+  --ink-2:      #8A9AA2;
+  --ink-3:      #5A6870;
+  --rule:       #2A3840;
+  --rule-soft:  #243038;
+  --signal:     #16B8C6;
+  --signal-dk:  #0F8E9A;
+  --marker:     rgba(255, 206, 48, .28);
+}
+
+[data-theme="dark"] .btn {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 1px 0 rgba(0,0,0,.3);
+}
+[data-theme="dark"] .btn:hover {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 3px 0 -1px rgba(0,0,0,.25);
+}
+[data-theme="dark"] .facts,
+[data-theme="dark"] .card,
+[data-theme="dark"] .p-spec {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ---------------------------------------------------------- theme toggle -- */
+.theme-btn {
+  position: fixed;
+  top: 11px;
+  right: 1.5rem;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  line-height: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+  -webkit-appearance: none;
+}
+.theme-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+
+@media (max-width: 560px) {
+  .theme-btn { top: 11px; right: .75rem; }
+}

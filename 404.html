@@ -8,8 +8,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function(){var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.setAttribute('data-theme','dark');})();
+</script>
 </head>
 <body>
+<button class="theme-btn" id="themeToggle" aria-label="Switch to dark mode" title="Toggle dark mode">☾</button>
+<script>
+  (function(){
+    var btn=document.getElementById('themeToggle');
+    function apply(dark){
+      document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+      btn.textContent=dark?'☀':'☾';
+      btn.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+    }
+    var saved=localStorage.getItem('theme');
+    apply(saved==='dark'||(saved==null&&window.matchMedia('(prefers-color-scheme:dark)').matches));
+    btn.addEventListener('click',function(){
+      var nowDark=document.documentElement.getAttribute('data-theme')!=='dark';
+      localStorage.setItem('theme',nowDark?'dark':'light');
+      apply(nowDark);
+    });
+  })();
+</script>
 <main class="wrap" style="min-height:70vh;display:flex;flex-direction:column;justify-content:center;padding:4rem 0">
   <p class="eyebrow">Error 404</p>
   <h1 style="font-size:clamp(2rem,6vw,3.4rem);font-weight:700;letter-spacing:-.03em;margin:.4rem 0 .6rem">No signal on this line.</h1>

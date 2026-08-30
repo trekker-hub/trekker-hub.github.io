@@ -398,3 +398,25 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 })();
+
+/* ---------------------------------------------------------- theme toggle -- */
+(function () {
+  var btn = document.getElementById("themeToggle");
+  if (!btn) return;
+
+  function apply(dark) {
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    btn.textContent = dark ? "☀" : "☾";
+    btn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  }
+
+  var saved = localStorage.getItem("theme");
+  var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  apply(saved === "dark" || (saved == null && prefersDark));
+
+  btn.addEventListener("click", function () {
+    var nowDark = document.documentElement.getAttribute("data-theme") !== "dark";
+    localStorage.setItem("theme", nowDark ? "dark" : "light");
+    apply(nowDark);
+  });
+})();

@@ -11,9 +11,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function(){var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.setAttribute('data-theme','dark');})();
+</script>
 </head>
 
 <body data-page="project">
+<button class="theme-btn" id="themeToggle" aria-label="Switch to dark mode" title="Toggle dark mode">☾</button>
 
 <header class="rail">
   <div class="wrap rail-in">
