@@ -141,150 +141,13 @@
     return out.join("");
   }
 
-  function projectCard(p) {
-    const href = p.detail ? `project.html?id=${encodeURIComponent(p.id)}`
-                          : (p.links && p.links[0] ? p.links[0].url : "");
-    const title = href
-      ? `<a href="${esc(href)}"${p.detail ? "" : ' target="_blank" rel="noopener"'}>${esc(p.title)}</a>`
-      : esc(p.title);
-
-    const extra = (p.links || [])
-      .map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)
-      .join("");
-
-    return `<article class="proj">
-      <div class="proj-meta">
-        ${p.featured ? '<div class="feat">FEATURED</div>' : ""}
-        <div>${esc(p.period)}</div>
-        <div><span class="st">${esc(p.status)}</span></div>
-      </div>
-      <div>
-        <h3 class="proj-title">${title}</h3>
-        ${p.subtitle ? `<p class="proj-sub">${esc(p.subtitle)}</p>` : ""}
-        ${p.image ? `<div class="proj-shot"><img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy"></div>` : ""}
-        <p class="proj-blurb">${esc(p.blurb)}</p>
-        <div class="tags">${(p.tags || []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
-        <div class="proj-links">
-          ${p.detail ? `<a href="project.html?id=${encodeURIComponent(p.id)}">Read the write-up →</a>` : ""}
-          ${extra}
-        </div>
-      </div>
-    </article>`;
-  }
-
-  function renderHome() {
-    const S = SITE, P = S.profile, L = S.links;
-
-    document.title = `${P.name} — ${P.role}`;
-    const md = $('meta[name="description"]');
-    if (md) md.setAttribute("content", P.tagline);
-
-    el("mkInit").textContent = P.initials;
-    el("mkName").textContent = P.name;
-    el("mkRole").textContent = P.role;
-
-    const led = el("led");
-    led.dataset.status = P.status || "off";
-    led.append(document.createTextNode(P.statusText || ""));
-
-    el("heroName").textContent = P.name;
-    el("heroTag").textContent  = P.tagline;
-    el("heroSub").textContent  = P.subline;
-    el("actions").innerHTML    = linkRow(L);
-
-    // ---- timing diagram
-    el("display").innerHTML = timingSVG(S.timeline);
-    el("dispRange").textContent = `${S.timeline.startYear} – ${S.timeline.endYear}`;
-    el("legend").innerHTML = (S.timeline.channels || [])
-      .map((c, i) => `<span><i style="background:var(--ch${(i % 6) + 1})"></i>${esc(c.name)}</span>`)
-      .join("");
-
-    // fade + hint on the right edge, but only while there is more to see
-    const scroller = el("display");
-    const wrap = scroller.parentElement;
-    const syncScroll = () => {
-      const more = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft > 4;
-      wrap.dataset.scroll = more ? "1" : "0";
-      const hint = $(".display-bar .hint");
-      if (hint) hint.style.visibility = scroller.scrollWidth > scroller.clientWidth + 4 ? "visible" : "hidden";
-    };
-    scroller.addEventListener("scroll", syncScroll, { passive: true });
-    window.addEventListener("resize", syncScroll, { passive: true });
-    syncScroll();
-
-    // ---- about
-    el("aboutCopy").innerHTML = S.about.map((p) => `<p>${esc(p)}</p>`).join("");
-    el("facts").innerHTML = S.facts
-      .map((f) => `<div><dt>${esc(f.k)}</dt><dd>${esc(f.v)}</dd></div>`)
-      .join("");
-
-    // ---- projects
-    el("projList").innerHTML = S.projects.map(projectCard).join("");
-
-    // ---- experience
-    el("expList").innerHTML = S.experience.map((x) => `<article class="xp">
-      <div class="xp-when"><div>${esc(x.period)}</div><div>${esc(x.place || "")}</div></div>
-      <div>
-        <h3>${esc(x.role)}</h3>
-        <p class="org">${esc(x.org)}</p>
-        <ul>${(x.points || []).map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
-      </div>
-    </article>`).join("");
-
-    // ---- education
-    el("eduList").innerHTML = S.education.map((e) => `<div class="card">
-      <div class="eyebrow">${esc(e.period)}</div>
-      <h3>${esc(e.school)}</h3>
-      <p class="deg">${esc(e.degree)}</p>
-      <div class="meta">${esc(e.place)}${e.detail ? "<br>" + esc(e.detail) : ""}</div>
-    </div>`).join("");
-    el("courseList").innerHTML = (S.coursework || []).map((c) => `<span>${esc(c)}</span>`).join("");
-
-    // ---- skills
-    el("skillList").innerHTML = S.skills.map((g) => `<div>
-      <h3>${esc(g.group)}</h3>
-      <div class="tags">${g.items.map((i) => `<span>${esc(i)}</span>`).join("")}</div>
-    </div>`).join("");
-
-    // ---- awards
-    el("awardList").innerHTML = S.awards.map((a) => `<div class="award">
-      <div class="yr">${esc(a.year)}</div>
-      <div><b>${esc(a.title)}</b><i>${esc(a.org)}</i></div>
-    </div>`).join("");
-
-    // ---- next
-    el("nextList").innerHTML = S.next.map((n) => `<div class="card">
-      <div class="when">${esc(n.when)}</div>
-      <h3>${esc(n.title)}</h3>
-      <p>${esc(n.body)}</p>
-    </div>`).join("");
-
-    // ---- contact
-    const rows = [];
-    if (L.email)    rows.push(["Email", `<a href="mailto:${esc(L.email)}">${esc(L.email)}</a>`]);
-    if (L.phone)    rows.push(["Phone", `<a href="tel:${esc(L.phone.replace(/[^\d+]/g, ""))}">${esc(L.phone)}</a>`]);
-    if (L.github)   rows.push(["GitHub", `<a href="${esc(L.github)}" target="_blank" rel="noopener">${esc(L.github.replace(/^https?:\/\//, ""))}</a>`]);
-    if (L.linkedin) rows.push(["LinkedIn", `<a href="${esc(L.linkedin)}" target="_blank" rel="noopener">${esc(L.linkedin.replace(/^https?:\/\//, ""))}</a>`]);
-    if (L.resume)   rows.push(["Résumé", `<a href="${esc(L.resume)}" target="_blank" rel="noopener">Download PDF</a>`]);
-    rows.push(["Based in", esc(P.location)]);
-    el("actions2").innerHTML = linkRow(L);
-    el("contactList").innerHTML = rows.map((r) => `<div><span>${r[0]}</span>${r[1]}</div>`).join("");
-
-    el("footName").textContent = P.name;
-    el("footNote").textContent = S.footer.note;
-    el("year").textContent = new Date().getFullYear();
-
-    scrollSpy();
-    reveal();
-  }
-
   /* =========================================================== PROJECT === */
 
   function block(b) {
     if (b.h)    return `<h2>${esc(b.h)}</h2>`;
     if (b.p)    return `<p>${esc(b.p)}</p>`;
     if (b.list) return `<ul>${b.list.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
-    if (b.img)  return `<figure><img src="${esc(b.img)}" alt="${esc(b.caption || "")}" loading="lazy">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ""}</figure>`;
+    if (b.img)  return `<figure><img src="${esc(b.img)}" alt="${esc(b.alt || b.caption || "")}" loading="lazy">${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ""}</figure>`;
     if (b.code) return `<pre><code>${esc(b.code)}</code></pre>`;
     if (b.note) return `<div class="p-note">${esc(b.note)}</div>`;
     return "";
@@ -294,16 +157,16 @@
     const S = SITE;
     el("mkInit").textContent = S.profile.initials;
     el("mkName").textContent = S.profile.name;
-    el("mkRole").textContent = S.profile.role;
+    if(el("mkRole")) el("mkRole").textContent = S.profile.role;
 
     const id = new URLSearchParams(location.search).get("id");
-    const p  = S.projects.find((x) => x.id === id);
+    const p  = S.projects.find((x) => x.id === id && x.published !== false && x.detail);
 
     if (!p) {
       el("pMain").innerHTML =
         `<div class="p-head"><h1>Project not found</h1>
          <p class="sub">There's nothing filed under “${esc(id || "")}”.</p>
-         <a class="btn" href="index.html">Back to all projects</a></div>`;
+         <a class="btn" href="projects.html">Back to all projects</a></div>`;
       return;
     }
 
@@ -322,17 +185,17 @@
         <div class="eyebrow">Project</div>
         <h1>${esc(p.title)}</h1>
         ${p.subtitle ? `<p class="sub">${esc(p.subtitle)}</p>` : ""}
-        ${(p.links || []).length ? `<div class="proj-links" style="margin-bottom:1.4rem">${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>` : ""}
+        ${(p.links || []).filter(l => !l.hidden).length ? `<div class="proj-links" style="margin-bottom:1.4rem">${p.links.filter(l => !l.hidden).map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>` : ""}
         <dl class="p-spec">${specs.map((s) => `<div><dt>${esc(s[0])}</dt><dd>${esc(s[1])}</dd></div>`).join("")}</dl>
       </div>
-      ${p.image ? `<figure style="margin:0 0 2rem"><img src="${esc(p.image)}" alt="${esc(p.title)}" style="border:1px solid var(--rule);border-radius:3px"></figure>` : ""}
+      ${p.image ? `<figure style="margin:0 0 2rem"><img src="${esc(p.image)}" alt="${esc(p.imageAlt || p.title)}" style="border:1px solid var(--rule);border-radius:3px"></figure>` : ""}
       <div class="p-body">
         <p style="font-size:1.06rem;color:var(--ink)">${esc(p.blurb)}</p>
         ${(p.blocks || []).map(block).join("")}
         <div class="tags" style="margin-top:2rem">${(p.tags || []).map((t) => `<span>${esc(t)}</span>`).join("")}</div>
       </div>`;
 
-    const others = S.projects.filter((x) => x.id !== p.id && x.detail).slice(0, 3);
+    const others = S.projects.filter((x) => x.id !== p.id && x.detail && x.published !== false).slice(0, 3);
     el("pMore").innerHTML = others.length
       ? `<div class="eyebrow" style="margin-bottom:1rem">Other projects</div>
          <div class="edu-grid">${others.map((o) => `<a class="card" href="project.html?id=${encodeURIComponent(o.id)}" style="text-decoration:none;color:inherit;display:block">
@@ -345,26 +208,47 @@
     reveal();
   }
 
-  /* ============================================================== misc === */
 
-  function scrollSpy() {
-    const links = [...document.querySelectorAll(".rail-nav a")];
-    const map = new Map();
-    links.forEach((a) => {
-      const t = document.querySelector(a.getAttribute("href"));
-      if (t) map.set(t, a);
-    });
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          links.forEach((l) => l.classList.remove("on"));
-          const a = map.get(e.target);
-          if (a) a.classList.add("on");
-        }
-      });
-    }, { rootMargin: "-20% 0px -70% 0px" });
-    map.forEach((_, t) => io.observe(t));
+  function renderSite() {
+    const S=SITE, P=S.profile, page=document.body.dataset.page;
+    const put=(id,value)=>{if(el(id))el(id).textContent=value||''};
+    put('mkInit',P.initials);put('mkName',P.name);put('footName',P.name);put('year',new Date().getFullYear());put('footNote',S.footer.note);
+    put('contactCopy',P.contactText || "I'm looking for a computer engineering role in FPGA, embedded systems, firmware, or hardware-adjacent software. I'd like to hear what you're building.");
+    el('actions2').innerHTML=linkRow(S.links);
+    el('contactList').innerHTML='<div><span>Based in</span>'+esc(P.location)+'</div>'+(S.links.phone?'<div><span>Phone</span><a href="tel:'+esc(S.links.phone.replace(/[^\d+]/g,''))+'">'+esc(S.links.phone)+'</a></div>':'');
+    document.querySelectorAll('#siteNav a').forEach(a=>{if(a.getAttribute('href')===page+'.html'){a.classList.add('on');a.setAttribute('aria-current','page')}});
+    const menu=el('menuToggle');menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',open);el('siteNav').classList.toggle('is-open',open)});
+    el('siteNav').addEventListener('click',()=>{menu.setAttribute('aria-expanded','false');el('siteNav').classList.remove('is-open')});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.setAttribute('aria-expanded','false');el('siteNav').classList.remove('is-open')}});
+    if(page==='project'){renderProject();return}
+    if(page==='index') {
+      document.title=P.name+' — '+P.role;
+      put('heroName',P.name);put('heroTag',P.tagline);put('heroSub',P.subline);put('heroEyebrow',P.role+' · '+P.location);
+      put('led',P.statusText);el('led').dataset.status=P.status||'off';
+      el('actions').innerHTML='<a class="btn btn-solid" href="projects.html">View projects →</a>'+(S.links.resume?'<a class="btn" href="'+esc(S.links.resume)+'">Résumé (PDF)</a>':'');
+    }
+    if(page==='index'||page==='projects') {
+      const projects=S.projects.filter(p=>p.published!==false && (page!=='index'||p.featured));
+      el('projList').innerHTML=(page==='index'?projects.slice(0,2):projects).map(p=>{
+        const href=p.detail?'project.html?id='+encodeURIComponent(p.id):'';
+        return '<article class="project-card">'+(p.image?'<div class="project-image"><img src="'+esc(p.image)+'" alt="'+esc(p.imageAlt||p.title)+'" loading="lazy" width="720" height="400"></div>':'')+'<div class="project-card-copy"><p class="eyebrow">'+esc(p.status)+' · '+esc(p.period)+'</p><h2>'+(href?'<a href="'+href+'">'+esc(p.title)+'</a>':esc(p.title))+'</h2><p>'+esc(p.summary||p.blurb)+'</p><div class="tags">'+(p.tags||[]).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><div class="proj-links">'+(href?'<a href="'+href+'">Explore project →</a>':'')+(p.links||[]).filter(l=>!l.hidden).map(l=>'<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+' ↗</a>').join('')+'</div></div></article>';
+      }).join('')||'<p>More projects coming soon.</p>';
+    }
+    if(page==='about') {
+      el('aboutCopy').innerHTML=S.about.map(p=>'<p>'+esc(p)+'</p>').join('');
+      el('facts').innerHTML=S.facts.map(f=>'<div><dt>'+esc(f.k)+'</dt><dd>'+esc(f.v)+'</dd></div>').join('');
+      el('display').innerHTML=timingSVG(S.timeline);put('dispRange',S.timeline.startYear+' – '+S.timeline.endYear);
+      el('legend').innerHTML=S.timeline.channels.map(c=>'<span>'+esc(c.name)+'</span>').join('');
+      el('mobileTimeline').innerHTML=S.timeline.channels.map(c=>'<div><h3>'+esc(c.name)+'</h3>'+c.segments.map(s=>'<p><b>'+esc(s.label)+'</b><br><span>'+esc(s.start)+' → '+esc(s.end==='now'?'Present':s.end)+'</span></p>').join('')+'</div>').join('');
+      el('expList').innerHTML=S.experience.map(x=>'<article class="xp"><div class="xp-when">'+esc(x.period)+'<br>'+esc(x.place)+'</div><div><h3>'+esc(x.role)+'</h3><p class="org">'+esc(x.org)+'</p><ul>'+x.points.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul></div></article>').join('');
+      el('eduList').innerHTML=S.education.map(e=>'<div class="card"><p class="eyebrow">'+esc(e.period)+'</p><h3>'+esc(e.school)+'</h3><p>'+esc(e.degree)+'</p><p class="meta">'+esc(e.place)+'<br>'+esc(e.detail)+'</p></div>').join('');
+      el('courseList').innerHTML=S.coursework.map(c=>'<span>'+esc(c)+'</span>').join('');
+      el('skillList').innerHTML=S.skills.map(g=>'<div><h3>'+esc(g.group)+'</h3><div class="tags">'+g.items.map(i=>'<span>'+esc(i)+'</span>').join('')+'</div></div>').join('');
+      el('awardList').innerHTML=S.awards.map(a=>'<div class="award"><span class="yr">'+esc(a.year)+'</span><div><b>'+esc(a.title)+'</b><i>'+esc(a.org)+'</i></div></div>').join('');
+      el('nextList').innerHTML=S.next.map(n=>'<div class="card"><span class="when">'+esc(n.when)+'</span><h3>'+esc(n.title)+'</h3><p>'+esc(n.body)+'</p></div>').join('');
+    }
   }
+  /* ============================================================== misc === */
 
   function reveal() {
     const items = document.querySelectorAll(".sec");
@@ -386,8 +270,7 @@
       return;
     }
     try {
-      if (document.body.dataset.page === "project") renderProject();
-      else renderHome();
+      renderSite();
     } catch (err) {
       console.error(err);
       document.body.insertAdjacentHTML("afterbegin",
@@ -410,13 +293,13 @@
     btn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
   }
 
-  var saved = localStorage.getItem("theme");
+  var saved; try { saved = localStorage.getItem("theme"); } catch(e) {}
   var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   apply(saved === "dark" || (saved == null && prefersDark));
 
   btn.addEventListener("click", function () {
     var nowDark = document.documentElement.getAttribute("data-theme") !== "dark";
-    localStorage.setItem("theme", nowDark ? "dark" : "light");
+    try { localStorage.setItem("theme", nowDark ? "dark" : "light"); } catch(e) {}
     apply(nowDark);
   });
 })();

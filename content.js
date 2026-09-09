@@ -13,7 +13,7 @@
    If the site ever goes blank after an edit, you broke rule 1 or 2.
    Open the page, press F12, click "Console", and it will tell you the line.
 
-   Full instructions are in GUIDE.md
+   Full instructions are in README.md
    ========================================================================== */
 
 const SITE = {
@@ -123,7 +123,7 @@ const SITE = {
                  false = just shows on the homepage
      "image"   : "images/whatever.jpg" — or leave "" for a placeholder
      "links"   : add as many as you like, or leave the list empty: []
-     "blocks"  : the content of the detail page. See GUIDE.md for the
+     "blocks"  : the content of the detail page. See README.md for the
                  five block types you can use.
      ------------------------------------------------------------------- */
   projects: [
@@ -131,6 +131,7 @@ const SITE = {
     {
       id: "cubesat",
       title: "CubeSat FPGA Development Platform",
+      summary: "An Artix-7 payload platform with Ada/SPARK communication drivers and a completed PCB design. First place in the GMU ECE senior design competition.",
       subtitle: "Formally verified payload computer for a 1U satellite",
       period: "Fall 2025 – Spring 2026",
       status: "Design complete",
@@ -140,7 +141,7 @@ const SITE = {
       blurb: "An open-source FPGA payload platform for CubeSat missions: a three-layer PCB carrying an Artix-7, its own power distribution and thermal monitoring, and firmware written in Ada/SPARK so the compiler proves the communication drivers correct before anything is flashed. Won first place in the GMU ECE senior design competition.",
       tags: ["VHDL", "Ada/SPARK", "Artix-7", "PCB design", "Formal verification", "I2C / SPI / UART"],
       links: [
-        { label: "GitHub", url: "https://github.com/trekker-hub" },
+        { label: "GitHub", url: "https://github.com/trekker-hub/Spark-1U-Cubesat" },
       ],
       blocks: [
         { h: "The problem" },
@@ -162,24 +163,26 @@ const SITE = {
         { h: "Result" },
         { p: "The PCB design is complete and ready for fabrication and stress testing. The project took first place in the George Mason ECE senior design competition in 2026 and is being carried forward as a shared platform for university-wide Ada/SPARK firmware work." },
 
-        { img: "images/cubesat/cubesat-pcb.png", caption: "This is the PCB design of the for power regulation. It handles the entire FPGA and sensors with multiple buses for sensor communication in 2D & 3D" },
+        { img: "images/cubesat/cubesat-pcb.png", caption: "Power-regulation PCB design for the FPGA and sensors, showing the communication buses in 2D and 3D." },
       ],
     },
 
     {
       id: "avatar",
       title: "AVATAR — Wearable Biometric Pipeline",
+      summary: "Wearable sensing for a VR research platform. A Galaxy Watch application captures physiological signals for a continuous biometric pipeline.",
       subtitle: "Physiological sensing for a VR addiction-recovery platform",
       period: "May 2026 – present",
       status: "Active research",
       featured: true,
       detail: true,
-      image: "",
+      image: "images/avatar/pipeline.svg",
+      imageAlt: "AVATAR pipeline: Galaxy Watch sensor capture, on-watch recording, and signal processing.",
       blurb: "AVATAR (Adaptive Virtual Assistant for Therapeutic Auto-Regulation) is a multidisciplinary GMU research program spanning computer engineering, bioengineering, and game design. I build the wearable side: continuous physiological capture on a Samsung Galaxy Watch, and the signal pipeline that turns it into a live signal the VR environment can respond to.",
       tags: ["Wear OS", "Kotlin", "Samsung Health Sensor SDK", "Signal processing", "Empatica", "Android services"],
       links: [
-        { label: "AVATAR-Samsung-Watch", url: "https://github.com/trekker-hub" },
-        { label: "Empatica-Pipeline",    url: "https://github.com/trekker-hub" },
+        { label: "Watch app", url: "https://github.com/trekker-hub/AVATAR-Samsung-Watch" },
+        { label: "Empatica pipeline", url: "https://github.com/trekker-hub/AVATAR-Empatica-Pipeline", hidden: true },
       ],
       blocks: [
         { h: "What the program is trying to do" },
@@ -195,8 +198,6 @@ const SITE = {
 
         { h: "Where it is now" },
         { p: "The recording application runs reliably through multi-hour sessions. Current work is on the signal-processing stage: extracting heart-rate variability features from the raw PPG stream and defining the thresholds the VR side listens for." },
-
-        { note: "Screenshots of the watch UI, or a plot of a recorded session, would go well here." },
       ],
     },
 
@@ -212,7 +213,7 @@ const SITE = {
       blurb: "An embedded system that watches how a car is actually being driven — speed, harsh acceleration, cornering — and raises an alert over MQTT in under two seconds. Built on an Arduino Nano 33 IoT with a BN220 GPS and an LSM6DS3 IMU, with ten minutes of local buffering so a dropped connection doesn't mean lost data.",
       tags: ["C++", "Arduino Nano 33 IoT", "GPS", "IMU", "MQTT", "PCB design"],
       links: [
-        { label: "GitHub", url: "https://github.com/trekker-hub" },
+        { label: "GitHub", url: "https://github.com/trekker-hub/DriveGuard_IoT_System" },
       ],
       blocks: [
         { h: "Overview" },
@@ -267,7 +268,7 @@ const SITE = {
       blurb: "An Ubuntu server running Docker, a local Llama 3.1 deployment on CUDA, and an n8n pipeline that reads job postings, filters them with the local model, files the good ones into Notion and pings me on Discord. Built partly to job-hunt faster and partly because renting three containers by the month felt like a bad trade.",
       tags: ["Ubuntu Server", "Docker", "Ollama", "CUDA", "n8n", "Notion API", "Raspberry Pi CM4", "Coral Edge TPU"],
       links: [
-        { label: "GitHub", url: "https://github.com/trekker-hub" },
+        { label: "GitHub", url: "https://github.com/trekker-hub/laptop-home-server" },
       ],
       blocks: [
         { h: "The stack" },

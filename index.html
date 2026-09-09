@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tariq Aldalou — Computer Engineer</title>
+<title>Computer engineer — Tariq Aldalou</title>
 <meta name="description" content="Computer engineer working on FPGA design, embedded systems and formally verified firmware.">
 <meta name="author" content="Tariq Aldalou">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%2314181A'/><path d='M5 21h5v-8h6v8h5v-4h6' stroke='%23FFD230' stroke-width='2.5' fill='none'/></svg>">
@@ -16,144 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script>
-  (function(){var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.setAttribute('data-theme','dark');})();
-</script>
+<script>try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.dataset.theme="dark"}catch(e){}</script>
 </head>
 
-<body data-page="home">
-<button class="theme-btn" id="themeToggle" aria-label="Switch to dark mode" title="Toggle dark mode">☾</button>
-
-<!-- ===== top rail ===================================================== -->
-<header class="rail">
-  <div class="wrap rail-in">
-    <a class="rail-mark" href="index.html">
-      <b id="mkInit">TA</b>
-      <span id="mkName">Tariq Aldalou</span>
-      <span class="role" id="mkRole"></span>
-    </a>
-    <nav class="rail-nav" aria-label="Sections">
-      <a href="#about">About</a>
-      <a href="#work">Projects</a>
-      <a href="#experience">Experience</a>
-      <a href="#education">Education</a>
-      <a href="#skills">Skills</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <span class="led" id="led" style="margin-left:1.25rem"></span>
-  </div>
-</header>
-
-<main>
-
-  <!-- ===== hero ======================================================= -->
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow">Computer engineer · Northern Virginia</p>
-      <h1 class="hero-name" id="heroName"></h1>
-      <p class="hero-tag" id="heroTag"></p>
-      <p class="hero-sub" id="heroSub"></p>
-
-      <!-- the timing diagram -->
-      <div class="display">
-        <div class="display-bar">
-          <span>CH · TIMELINE</span>
-          <span class="sp"></span>
-          <span class="hint">drag to scroll →</span>
-          <span>RANGE <em id="dispRange"></em></span>
-        </div>
-        <div class="display-wrap"><div class="display-scroll" id="display"></div></div>
-        <div class="display-legend" id="legend"></div>
-      </div>
-
-      <div class="actions" id="actions"></div>
-    </div>
-  </section>
-
-  <!-- ===== about ====================================================== -->
-  <section class="sec" id="about">
-    <div class="wrap">
-      <div class="sec-head"><h2>About</h2><span class="rule"></span><span class="eyebrow">01</span></div>
-      <div class="about-grid">
-        <div class="about-copy" id="aboutCopy"></div>
-        <dl class="facts" id="facts"></dl>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== projects =================================================== -->
-  <section class="sec" id="work">
-    <div class="wrap">
-      <div class="sec-head"><h2>Projects</h2><span class="rule"></span><span class="eyebrow">02</span></div>
-      <div class="proj-list" id="projList"></div>
-    </div>
-  </section>
-
-  <!-- ===== experience ================================================= -->
-  <section class="sec" id="experience">
-    <div class="wrap">
-      <div class="sec-head"><h2>Experience</h2><span class="rule"></span><span class="eyebrow">03</span></div>
-      <div id="expList"></div>
-    </div>
-  </section>
-
-  <!-- ===== education ================================================== -->
-  <section class="sec" id="education">
-    <div class="wrap">
-      <div class="sec-head"><h2>Education</h2><span class="rule"></span><span class="eyebrow">04</span></div>
-      <div class="edu-grid" id="eduList"></div>
-      <div class="course-strip" id="courseList"></div>
-    </div>
-  </section>
-
-  <!-- ===== skills ===================================================== -->
-  <section class="sec" id="skills">
-    <div class="wrap">
-      <div class="sec-head"><h2>Skills</h2><span class="rule"></span><span class="eyebrow">05</span></div>
-      <div class="skill-grid" id="skillList"></div>
-    </div>
-  </section>
-
-  <!-- ===== awards ===================================================== -->
-  <section class="sec" id="awards">
-    <div class="wrap">
-      <div class="sec-head"><h2>Awards</h2><span class="rule"></span><span class="eyebrow">06</span></div>
-      <div class="awards" id="awardList"></div>
-    </div>
-  </section>
-
-  <!-- ===== next ======================================================= -->
-  <section class="sec" id="next">
-    <div class="wrap">
-      <div class="sec-head"><h2>What's next</h2><span class="rule"></span><span class="eyebrow">07</span></div>
-      <div class="next-grid" id="nextList"></div>
-    </div>
-  </section>
-
-  <!-- ===== contact ==================================================== -->
-  <section class="sec" id="contact">
-    <div class="wrap">
-      <div class="sec-head"><h2>Get in touch</h2><span class="rule"></span><span class="eyebrow">08</span></div>
-      <div class="contact-in">
-        <div>
-          <p>I'm looking for a computer engineering role — FPGA, embedded, firmware, or hardware-adjacent software. If you're building something that has to actually work on real hardware, I'd like to hear about it.</p>
-          <div class="actions" id="actions2"></div>
-        </div>
-        <div class="contact-list" id="contactList"></div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<footer class="foot">
-  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;width:min(100% - 2*var(--pad), var(--wrap))">
-    <span>© <span id="year"></span> <span id="footName"></span></span>
-    <span id="footNote"></span>
-  </div>
-</footer>
-
-<script src="content.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+<body data-page="index"><a class="skip-link" href="#main">Skip to content</a><header class="rail"><div class="wrap rail-in"><a class="rail-mark" href="index.html"><b id="mkInit">TA</b><span id="mkName">Tariq Aldalou</span></a><button class="menu-btn" id="menuToggle" aria-expanded="false" aria-controls="siteNav">Menu</button><nav class="rail-nav" id="siteNav" aria-label="Main navigation"><a href="index.html">Home</a><a href="projects.html">Projects</a><a href="about.html">About & experience</a><a href="#contact">Contact</a></nav><button class="theme-btn" id="themeToggle" aria-label="Switch to dark mode">☾</button></div></header><main id="main"><section class="hero"><div class="wrap home-hero"><div><p class="eyebrow" id="heroEyebrow"></p><h1 class="hero-name" id="heroName"></h1><p class="hero-tag" id="heroTag"></p><div class="actions" id="actions"></div><p class="hero-sub" id="heroSub"></p></div><aside class="hero-aside"><span class="led" id="led"></span><div class="signal-art" aria-hidden="true"><svg viewBox="0 0 320 100"><path d="M0 70H45V30H105V70H165V30H225V70H320"/><path d="M0 90H85V50H145V90H205V50H265V90H320"/></svg></div><p class="eyebrow">Hardware · Firmware · Verification</p><p>From digital logic to dependable systems.</p><a href="about.html">More about me →</a></aside></div></section><section class="sec selected-work" id="work"><div class="wrap"><div class="sec-head"><h2>Selected work</h2><span class="rule"></span><a href="projects.html">All projects →</a></div><div class="project-grid" id="projList"></div></div></section></main><section class="sec contact-section" id="contact"><div class="wrap contact-in"><div><p class="eyebrow">Get in touch</p><h2>Let’s build something that works.</h2><p id="contactCopy"></p></div><div><div class="actions" id="actions2"></div><div class="contact-list" id="contactList"></div></div></div></section><footer class="foot"><div class="wrap footer-in"><span>© <span id="year"></span> <span id="footName"></span></span><span id="footNote"></span></div></footer><script src="content.js"></script><script src="app.js"></script></body></html>

@@ -1,0 +1,11 @@
+.editor-backups/
+node_modules/
+.preview/
+
+# Keep private tools and local reference files out of this public repository.
+/website-tools/
+/editor.html
+/editor-enhancements.js
+/preview-server.cjs
+/test-editor.cjs
+/Projects Github Links.xlsx

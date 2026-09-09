@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="400" viewBox="0 0 720 400" role="img" aria-labelledby="title desc">
+  <title id="title">AVATAR wearable sensing pipeline</title>
+  <desc id="desc">Galaxy Watch sensors feed on-watch recording, followed by signal processing. Channels include heart rate, PPG, motion, and temperature.</desc>
+  <rect width="720" height="400" rx="8" fill="#141A1D"/>
+  <g font-family="Arial, sans-serif">
+    <text x="40" y="60" fill="#90A5AE" font-size="15" letter-spacing="3">AVATAR / WEARABLE SENSING</text>
+    <g fill="#1F2C32" stroke="#3B515B">
+      <rect x="40" y="125" width="180" height="120" rx="6"/>
+      <rect x="270" y="125" width="180" height="120" rx="6"/>
+      <rect x="500" y="125" width="180" height="120" rx="6"/>
+    </g>
+    <g stroke="#4FC9F0" stroke-width="2" fill="none"><path d="M225 185h36m-8-7 8 7-8 7M455 185h36m-8-7 8 7-8 7"/></g>
+    <g fill="#DBE6EA" font-size="21" text-anchor="middle"><text x="130" y="178">Galaxy Watch</text><text x="360" y="178">On-watch</text><text x="590" y="178">Signal</text></g>
+    <g fill="#A6BBC4" font-size="17" text-anchor="middle"><text x="130" y="210">Sensor capture</text><text x="360" y="210">Recording</text><text x="590" y="210">Processing</text></g>
+    <path d="M40 298H680" stroke="#31454E"/>
+    <text x="40" y="340" fill="#90A5AE" font-size="17">Heart rate · PPG · Motion · Temperature</text>
+  </g>
+</svg>
